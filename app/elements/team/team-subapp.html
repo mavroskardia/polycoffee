@@ -1,0 +1,51 @@
+<dom-module id="team-subapp">
+    <style>
+        * { font-weight: 200; }
+        paper-fab {
+            position: fixed;
+            bottom: 1rem;
+            right: 2rem;
+        }
+        team-card {
+            display: inline-block;
+            margin: 0.5rem;
+        }
+        .hidden { display: none; }
+    </style>
+    <template>
+        <firebase-collection id="fb"
+            location="https://swcoffee.firebaseio.com/teams"
+            data="{{teams}}">
+        </firebase-collection>
+
+        <paper-fab icon="add" on-tap="add"></paper-fab>
+        <div class="horizontal layout wrap">
+            <div class="flex">
+                <header>
+                    <h2>Teams</h2>
+                </header>
+
+                <template is="dom-repeat" items="{{teams}}">
+                    <team-card team="{{item}}" on-tap="show"></team-card>
+                </template>
+            </div>
+            <team-view id="teamview" team="{{selectedTeam}}" class="hidden flex-2"></team-view>
+        </div>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'team-subapp',
+        add: function () {
+            this.$.fb.add({
+                name: 'Default Team Name'
+            });
+        },
+        show: function (e) {
+            this.selectedTeam = e.currentTarget.team;
+            [].forEach.call(this.querySelectorAll('team-card'), e => e.selected = false);
+            e.currentTarget.selected = true;
+            this.$.teamview.classList.remove('hidden');
+        }
+    });
+</script>

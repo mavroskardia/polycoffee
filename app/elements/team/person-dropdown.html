@@ -1,0 +1,29 @@
+<dom-module id="person-dropdown">
+    <style></style>
+    <template>
+        <firebase-collection id="fb"
+            location="https://swcoffee.firebaseio.com/people"
+            data="{{people}}">
+        </firebase-collection>
+        <paper-dropdown-menu disabled="[[disabled]]" label="Person">
+            <paper-menu id="menu" class="dropdown-content"
+                on-iron-select="select">
+                <template is="dom-repeat" items="{{people}}">
+                    <paper-item>{{item.name}}</paper-item>
+                </template>
+            </paper-menu>
+        </paper-dropdown-menu>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'person-dropdown',
+        properties: {
+            person: {
+                type: Object,
+                notify: true
+            },
+            disabled: Boolean
+        }
+    });
+</script>

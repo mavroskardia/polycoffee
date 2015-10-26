@@ -1,0 +1,47 @@
+<dom-module id="team-card">
+    <style>
+        :hover { cursor: pointer; }
+        paper-card.selected { background-color: var(--primary-background-color); }
+    </style>
+    <template>
+        <template is="dom-if" if="{{team}}">
+            <firebase-collection
+                location="https://swcoffee.firebaseio.com/people/"
+                order-by-child="team"
+                equal-to="[[team.__firebaseKey__]]"
+                data="{{people}}">
+            </firebase-collection>
+        </template>
+
+        <paper-card id="card" heading="{{team.name}}" image="" elevation="1" animated-shadow="false">
+            <div class="card-content">
+                <span><span>{{people.length}}</span> people on this team</span>
+            </div>
+            <paper-ripple></paper-ripple>
+        </paper-card>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'team-card',
+        properties: {
+            team: {
+                type: Object,
+                notify: true
+            },
+            selected: {
+                type: Boolean,
+                value: false,
+                observer: 'selectedChanged'
+            }
+        },
+        selectedChanged: function (newValue, oldValue) {
+            if (oldValue === undefined) return;
+
+            if (newValue)
+                this.$.card.classList.add('selected');
+            else
+                this.$.card.classList.remove('selected');
+        }
+    });
+</script>

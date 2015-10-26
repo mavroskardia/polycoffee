@@ -1,0 +1,35 @@
+<dom-module id="coffee-dropdown">
+    <style>
+        paper-dropdown-menu {
+            display: block;
+        }
+    </style>
+    <template>
+        <firebase-collection id="fb"
+            location="https://swcoffee.firebaseio.com/inventory"
+            data="{{coffees}}">
+        </firebase-collection>
+        <paper-dropdown-menu label="Coffee">
+            <paper-menu id="menu" class="dropdown-content"
+                on-iron-select="select">
+                <template is="dom-repeat" items="{{coffees}}">
+                    <paper-item>{{item.name}}</paper-item>
+                </template>
+            </paper-menu>
+        </paper-dropdown-menu>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'coffee-dropdown',
+        properties: {
+            coffee: {
+                type: Object,
+                notify: true
+            }
+        },
+        select: function (e) {
+            this.coffee = this.coffees[parseInt(this.$.menu.selected)];
+        }
+    });
+</script>

@@ -1,0 +1,26 @@
+<dom-module id="coffee-bag-size">
+    <style></style>
+    <template>
+        <header>
+            <label>Bag Size</label>
+        </header>
+        <div class="contents">
+            <paper-radio-group selected="two">
+                <paper-radio-button name="one" label="1">1</paper-radio-button>
+                <paper-radio-button name="two" label="2">2</paper-radio-button>
+                <paper-radio-button name="five" label="5">5</paper-radio-button>
+            </paper-radio-group>
+        </div>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'coffee-bag-size',
+        properties: {
+            size: {
+                type: Number,
+                notify: true
+            }
+        }
+    })
+</script>

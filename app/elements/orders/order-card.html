@@ -1,0 +1,67 @@
+<dom-module id="order-card">
+    <style>
+        :hover {
+            cursor: pointer;
+        }
+        paper-card.selected { background-color: var(--primary-background-color); }
+    </style>
+    <template>
+        <firebase-collection id="fbitems"
+            location="https://swcoffee.firebaseio.com/items/"
+            order-by-child="order"
+            equal-to="[[order.__firebaseKey__]]"
+            data="{{items}}">
+        </firebase-collection>
+        <paper-card id="card" heading="{{toDate(order.date)}}" image="" elevation="1" animated-shadow="false">
+            <div class="card-content">
+                <span><span>{{items.length}}</span> items in this order</span>
+            </div>
+            <div class="card-actions">
+                <template is="dom-if" if="{{isOpen(order)}}">
+                    <paper-button on-tap="close">Close</paper-button>
+                </template>
+                <template is="dom-if" if="{{isClosed(order)}}">
+                    <paper-button on-tap="pay">Pay</paper-button>
+                </template>
+                <template is="dom-if" if="{{isPaid(order)}}">
+                    <strong>Paid</strong>
+                </template>
+            </div>
+            <paper-ripple></paper-ripple>
+        </paper-card>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'order-card',
+        properties: {
+            order: Object,
+            selected: {
+                type: Boolean,
+                value: false,
+                observer: '_selectedChanged'
+            }
+        },
+        _selectedChanged: function (newValue, oldValue) {
+            if (oldValue === undefined) return;
+
+            if (newValue)
+                this.$.card.classList.add('selected');
+            else
+                this.$.card.classList.remove('selected');
+        },
+        ready: function () {
+            this.fb = new Firebase('https://swcoffee.firebaseio.com/orders/' + this.order.__firebaseKey__);
+        },
+        isOpen: (o) => o.status == 'open',
+        isClosed: (o) => o.status == 'closed',
+        isPaid: (o) => o.status == 'paid',
+        toDate: (t) => new Date(t).toLocaleDateString(),
+        close: function () {
+            this.fb.update({status: 'closed'});
+        },
+        pay: function () {
+            this.fb.update({status: 'paid'});
+        }
+    });
+</script>

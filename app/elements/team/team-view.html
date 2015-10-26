@@ -1,0 +1,70 @@
+<dom-module id="team-view">
+    <style>
+        paper-material {
+            padding: 0.5rem;
+        }
+        .flex, .flex-2 { margin: 0 0.5rem;}
+    </style>
+    <template>
+        <firebase-collection id="fbpeople"
+            location="https://swcoffee.firebaseio.com/people/"
+            order-by-child="team"
+            equal-to="{{team.__firebaseKey__}}"
+            data="{{people}}">
+        </firebase-collection>
+        <h2>
+            <paper-input id="name" label="Team Name" value="{{team.name}}" on-change="change"></paper-input>
+        </h2>
+        <div class="horizontal layout wrap">
+            <div class="flex">
+                <h4>Add to Team</h4>
+                <paper-material elevation="1">
+                    <paper-input label="Name" placeholder="Name of person to add" on-change="addPerson"></paper-input>
+                </paper-material>
+            </div>
+            <div class="flex-2">
+                <h4>People on Team</h4>
+                <paper-material elevation="1">
+                    <ul>
+                        <template is="dom-repeat" items="{{people}}">
+                            <li class="horizontal layout center">
+                                <span class="flex">{{item.name}}</span>
+                                <paper-icon-button icon="clear" on-tap="removePerson" data-fbkey$="[[item.__firebaseKey__]]"></paper-icon-button>
+                            </li>
+                        </template>
+                    </ul>
+                </paper-material>
+            </div>
+        </div>
+    </template>
+</dom-module>
+<script>
+    var fburl = 'https://swcoffee.firebaseio.com/';
+    Polymer({
+        is: 'team-view',
+        properties: {
+            team: {
+                type: Object,
+                notify: true
+            }
+        },
+        change: function () {
+            var fb = new Firebase([fburl, 'teams', this.team.__firebaseKey__].join('/'));
+            fb.update({name: this.$.name.value});
+        },
+        addPerson: function (e) {
+            var fb = new Firebase([fburl, 'people'].join('/'));
+            fb = fb.push();
+            fb.set({
+                name: e.currentTarget.value,
+                team: this.team.__firebaseKey__
+            });
+            e.currentTarget.value = '';
+        },
+        removePerson: function (e) {
+            var fbkey = e.currentTarget.attributes['data-fbkey'].value;
+            var fb = new Firebase([fburl, 'people', fbkey].join('/'));
+            fb.remove();
+        }
+    });
+</script>

@@ -1,0 +1,82 @@
+<dom-module id="coffee-subapp">
+    <style>
+        * { font-weight: 200; }
+        strong { font-weight: 500; }
+        li {
+            list-style: none;
+            display: inline-block;
+            margin: 0.5rem;
+        }
+        .coffee {
+            position: relative;
+            padding: 0.5rem;
+            width: 12rem;
+            text-align: center;
+        }
+        .coffee strong, .coffee em {
+            display: block;
+        }
+    </style>
+    <template>
+        <h2>Coffee</h2>
+
+        <firebase-collection id="fb"
+            location="https://swcoffee.firebaseio.com/inventory"
+            data="{{coffees}}"></firebase-collection>
+
+        <iron-ajax id="ajax"
+             handle-as="json"
+             on-response="handleResponse"></iron-ajax>
+
+        <!--paper-button raised on-tap="rescan">Scrape Sweetwater</paper-button-->
+        <div id="message"></div>
+
+        <ul class="horizontal layout start wrap">
+            <template is="dom-repeat" items="{{coffees}}">
+                <li>
+                    <paper-material elevation="1" class="coffee">
+                        <img src="{{item.img}}">
+                        <em>{{item.name}}</em>
+                        <strong>{{item.price}}</strong>
+                    </paper-material>
+                </li>
+            </template>
+        </ul>
+    </template>
+</dom-module>
+<script>
+    function zip(arrays) {
+        return arrays[0].map((_,i) => arrays.map(a=>a[i]));
+    }
+
+    Polymer({
+        is: 'coffee-subapp',
+        rescan: function () {
+            var yql = encodeURIComponent('SELECT * FROM data.html.cssselect WHERE url="http://www.sweetwaterorganiccoffee.com/coffee/" AND css=".ProductList"');
+            var queryuri = `https://query.yahooapis.com/v1/public/yql?q=${yql}&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys`;
+            this.$.ajax.url = queryuri;
+            this.$.ajax.generateRequest();
+        },
+        handleResponse: function (data) {
+            var query = data.detail.response.query;
+            if (!query.results) {
+                this.$.message.innerText = 'No results for query';
+                return;
+            }
+            query.results.results.ul.li.forEach(function (li) {
+                var names = li.div.filter(d=>d.class.indexOf('ProductDetails') !== -1).map(d=>d.strong.a.content);
+                var prices = li.div.filter(d=>d.class.indexOf('Price') !== -1).map(d=>typeof d.em === 'object' ? d.em.span.content : d.em);
+                var images = li.div.filter(d=>d.class.indexOf('QuickView') !== -1).map(d=>d.a.img.src);
+
+                zip([names, prices, images]).forEach(d => {
+                    this.$.fb.add({
+                        name: d[0],
+                        price: d[1],
+                        img: d[2]
+                    });
+                });
+
+            }.bind(this));
+        }
+    });
+</script>

@@ -1,0 +1,42 @@
+<dom-module id="team-dropdown">
+    <style>
+    </style>
+    <template>
+        <firebase-collection id="fbteamdd"
+            location="https://swcoffee.firebaseio.com/teams"
+            data="{{teams}}">
+        </firebase-collection>
+
+        <paper-dropdown-menu label="Team">
+            <paper-menu id="menu"
+                class="dropdown-content"
+                attr-for-selected="data-val"
+                on-iron-select="select"
+                selected="[[order.team]]">
+                <template is="dom-repeat" items="{{teams}}">
+                    <paper-item data-val$="[[item.__firebaseKey__]]">{{item.name}}</paper-item>
+                </template>
+            </paper-menu>
+        </paper-dropdown-menu>
+
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'team-dropdown',
+        properties: {
+            order: {
+                type: Object,
+                notify: true
+            }
+        },
+        teamrefMatch: function (team) {
+            return team.__firebaseKey__ == this.order.team;
+        },
+        select: function () {
+            var fb = new Firebase('https://swcoffee.firebaseio.com/orders/' + this.order.__firebaseKey__);
+            fb.update({team: this.$.menu.selected});
+            this.fire('iron-select');
+        }
+    });
+</script>

@@ -1,0 +1,72 @@
+<dom-module id="order-view">
+    <style>
+        fieldset {
+            border: none;
+        }
+        paper-material { padding: 1rem; }
+        .spaced { margin: 0 0.5rem; }
+        #fields > * { margin: 0.5rem 0; }
+        coffee-dropdown { display: block; }
+    </style>
+    <template>
+        <firebase-collection id="fbitems"
+            location="https://swcoffee.firebaseio.com/items"
+            order-by-child="order"
+            equal-to="[[order.__firebaseKey__]]"
+            data="{{items}}">
+        </firebase-collection>
+
+        <h2>Order for <span>{{toDate(order.date)}}</span></h2>
+
+        <team-dropdown order="{{order}}"></team-dropdown>
+
+        <div class="horizontal layout wrap">
+            <div class="spaced">
+                <h4>Add to Order</h4>
+                <paper-material elevation="1">
+                    <div id="fields">
+                        <coffee-dropdown coffee="{{coffee}}"></coffee-dropdown>
+                        <coffee-bag-size size="{{bagsize}}"></coffee-bag-size>
+                        <coffee-quantity quantity="{{quantity}}"></coffee-quantity>
+                        <div>
+                            <paper-checkbox id="personal" checked="{{ispersonal}}">Personal Order</paper-checkbox>
+                            <person-dropdown disabled="{{!ispersonal}}" person="{{person}}"></person-dropdown>
+                        </div>
+                        <div>
+                            <paper-button raised on-tap="add">Add</paper-button>
+                        </div>
+                    </div>
+                </paper-material>
+            </div>
+            <div class="flex-2 spaced">
+                <h4>Order Items</h4>
+                <paper-material elevation="1">
+                    <ul>
+                        <template is="dom-repeat" items="{{items}}">
+                            <li>
+                                <span>{{item.quantity}}</span>x
+                                <span>{{item.bagsize}}</span>#
+                                <strong>{{item.coffee.name}}</strong>
+                            </li>
+                        </template>
+                    </ul>
+                </paper-material>
+            </div>
+        </div>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'order-view',
+        properties: {
+            order: Object,
+            team: Object
+        },
+        toDate: (t) => new Date(t).toLocaleDateString(),
+        add: function (e) {
+            this.$.fbitems.add({
+
+            });
+        }
+    });
+</script>

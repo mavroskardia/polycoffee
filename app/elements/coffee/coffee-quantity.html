@@ -1,0 +1,27 @@
+<dom-module id="coffee-quantity">
+    <style></style>
+    <template>
+        <header>
+            <label>Number of Bags</label>
+        </header>
+        <paper-radio-group selected="one">
+            <paper-radio-button name="one" label="1">1</paper-radio-button>
+            <paper-radio-button name="two" label="2">2</paper-radio-button>
+            <paper-radio-button name="three" label="3">3</paper-radio-button>
+            <paper-radio-button name="four" label="4">4</paper-radio-button>
+            <paper-radio-button name="five" label="5">5</paper-radio-button>
+            <paper-radio-button name="six" label="6">6</paper-radio-button>
+        </paper-radio-group>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'coffee-quantity',
+        properties: {
+            quantity: {
+                type: Number,
+                notify: true
+            }
+        }
+    })
+</script>

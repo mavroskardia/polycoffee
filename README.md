@@ -1,2 +1,3 @@
-# polycoffee
-Sweetwater Coffee Ordering App Written using Polymer and Firebase
+# Polycoffee
+
+Sweetwater Coffee Ordering App Written with Polymer and Firebase.
