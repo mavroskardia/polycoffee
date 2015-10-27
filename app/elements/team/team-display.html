@@ -1,0 +1,22 @@
+<dom-module id="team-display">
+    <style>
+    </style>
+    <template>
+        <span>{{team.name}}</span>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'team-display',
+        properties: {
+            ref: String
+        },
+        ready: function () {
+            var fb = new Firebase('https://swcoffee.firebaseio.com/teams');
+            fb.orderByKey().equalTo(this.ref).limitToFirst(1).on('child_added', function (ss) {
+                var val = ss.val();
+                this.team = val;
+            }.bind(this));
+        }
+    });
+</script>

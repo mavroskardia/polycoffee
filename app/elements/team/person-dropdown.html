@@ -1,5 +1,9 @@
 <dom-module id="person-dropdown">
-    <style></style>
+    <style>
+        paper-dropdown-menu { display: block; }
+        paper-item-body { border-bottom: solid 1px #eee; }
+        team-display { font-size: 0.8rem; font-style: oblique; color: #888; }
+    </style>
     <template>
         <firebase-collection id="fb"
             location="https://swcoffee.firebaseio.com/people"
@@ -9,7 +13,12 @@
             <paper-menu id="menu" class="dropdown-content"
                 on-iron-select="select">
                 <template is="dom-repeat" items="{{people}}">
-                    <paper-item>{{item.name}}</paper-item>
+                    <paper-item>
+                        <paper-item-body multi>
+                            <div>{{item.name}}</div>
+                            <team-display secondary ref="{{item.team}}"></team-display>
+                        </paper-item-body>
+                    </paper-item>
                 </template>
             </paper-menu>
         </paper-dropdown-menu>
@@ -23,7 +32,11 @@
                 type: Object,
                 notify: true
             },
+            team: String,
             disabled: Boolean
+        },
+        select: function () {
+            this.person = this.people[this.$.menu.selected];
         }
     });
 </script>

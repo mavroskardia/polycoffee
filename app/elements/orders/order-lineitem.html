@@ -1,0 +1,55 @@
+<dom-module id="order-lineitem">
+    <style>
+    </style>
+    <template>
+        <div class="horizontal layout center">
+            <div class="flex">
+                <template is="dom-if" if="{{item.person}}">
+                    <person-display ref="{{item.person}}"></person-display>
+                </template>
+                <span>{{item.quantity}}</span>&times;
+                <span>{{item.size}}</span>#
+                <coffee-display ref="{{item.coffee}}"></coffee-display>
+            </div>
+            <paper-icon-button icon="clear" class="end" on-tap="removeItem"></paper-icon-button>
+        </div>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'order-lineitem',
+        behaviors: [
+            Polymer.NeonAnimationRunnerBehavior
+        ],
+        properties: {
+            item: Object,
+            animationConfig: {
+                value: function () {
+                    return {
+                        'entry': {
+                            name: 'fade-in-animation',
+                            node: this
+                        },
+                        'exit': {
+                            name: 'fade-out-animation',
+                            node: this
+                        }
+                    };
+                }
+            }
+        },
+        listeners: {
+            'neon-animation-finish': '_onAnimationFinish'
+        },
+        attached: function () {
+            this.playAnimation('entry', false);
+        },
+        removeItem: function () {
+            this.playAnimation('exit', true);
+        },
+        _onAnimationFinish: function (e, isRemove) {
+            if (isRemove)
+                this.fire('remove-item', this.item);
+        }
+    });
+</script>

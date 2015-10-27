@@ -5,10 +5,10 @@
             <label>Bag Size</label>
         </header>
         <div class="contents">
-            <paper-radio-group selected="two">
-                <paper-radio-button name="one" label="1">1</paper-radio-button>
-                <paper-radio-button name="two" label="2">2</paper-radio-button>
-                <paper-radio-button name="five" label="5">5</paper-radio-button>
+            <paper-radio-group id="rads" selected="{{size}}">
+                <paper-radio-button name="1">1</paper-radio-button>
+                <paper-radio-button name="2">2</paper-radio-button>
+                <paper-radio-button name="5">5</paper-radio-button>
             </paper-radio-group>
         </div>
     </template>
@@ -18,9 +18,10 @@
         is: 'coffee-bag-size',
         properties: {
             size: {
-                type: Number,
+                type: String,
+                value: '2',
                 notify: true
             }
         }
-    })
+    });
 </script>

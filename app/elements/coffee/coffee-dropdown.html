@@ -3,6 +3,17 @@
         paper-dropdown-menu {
             display: block;
         }
+        paper-item-body {
+            display: block;
+            width: 100%;
+            border-bottom: solid 1px #eee;
+        }
+        paper-item-body em {
+            font-style: oblique;
+            text-align: right;
+            font-size: 0.8rem;
+            color: #888;
+        }
     </style>
     <template>
         <firebase-collection id="fb"
@@ -13,7 +24,12 @@
             <paper-menu id="menu" class="dropdown-content"
                 on-iron-select="select">
                 <template is="dom-repeat" items="{{coffees}}">
-                    <paper-item>{{item.name}}</paper-item>
+                    <paper-item>
+                        <paper-item-body class="horizontal layout">
+                            <span class="flex">{{item.name}}</span>
+                            <em>{{item.price}}</em>
+                        </paper-item-body>
+                    </paper-item>
                 </template>
             </paper-menu>
         </paper-dropdown-menu>
@@ -28,8 +44,9 @@
                 notify: true
             }
         },
-        select: function (e) {
+        select: function () {
             this.coffee = this.coffees[parseInt(this.$.menu.selected)];
+            this.fire('iron-select', this.coffee);
         }
     });
 </script>

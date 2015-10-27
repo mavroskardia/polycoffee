@@ -1,0 +1,22 @@
+<dom-module id="coffee-display">
+    <style>
+    </style>
+    <template>
+        <span>{{coffee.name}}</span>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'coffee-display',
+        properties: {
+            ref: String
+        },
+        ready: function () {
+            var fb = new Firebase('https://swcoffee.firebaseio.com/inventory');
+            fb.orderByKey().equalTo(this.ref).limitToFirst(1).on('child_added', function (ss) {
+                var val = ss.val();
+                this.coffee = val;
+            }.bind(this));
+        }
+    });
+</script>

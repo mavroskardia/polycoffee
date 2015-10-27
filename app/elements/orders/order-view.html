@@ -6,14 +6,23 @@
         paper-material { padding: 1rem; }
         .spaced { margin: 0 0.5rem; }
         #fields > * { margin: 0.5rem 0; }
-        coffee-dropdown { display: block; }
+        coffee-dropdown, person-dropdown { display: block; }
+        .lineitem { border-bottom: solid 1px #eee; }
+        .lineitem order-lineitem { width: 100%; }
     </style>
     <template>
-        <firebase-collection id="fbitems"
-            location="https://swcoffee.firebaseio.com/items"
+        <firebase-collection id="teamitems"
+            location="https://swcoffee.firebaseio.com/teamitems"
             order-by-child="order"
             equal-to="[[order.__firebaseKey__]]"
-            data="{{items}}">
+            data="{{teamitems}}">
+        </firebase-collection>
+
+        <firebase-collection id="personalitems"
+            location="https://swcoffee.firebaseio.com/personalitems"
+            order-by-child="order"
+            equal-to="[[order.__firebaseKey__]]"
+            data="{{personalitems}}">
         </firebase-collection>
 
         <h2>Order for <span>{{toDate(order.date)}}</span></h2>
@@ -23,33 +32,42 @@
         <div class="horizontal layout wrap">
             <div class="spaced">
                 <h4>Add to Order</h4>
-                <paper-material elevation="1">
-                    <div id="fields">
-                        <coffee-dropdown coffee="{{coffee}}"></coffee-dropdown>
-                        <coffee-bag-size size="{{bagsize}}"></coffee-bag-size>
-                        <coffee-quantity quantity="{{quantity}}"></coffee-quantity>
-                        <div>
-                            <paper-checkbox id="personal" checked="{{ispersonal}}">Personal Order</paper-checkbox>
-                            <person-dropdown disabled="{{!ispersonal}}" person="{{person}}"></person-dropdown>
-                        </div>
-                        <div>
-                            <paper-button raised on-tap="add">Add</paper-button>
-                        </div>
-                    </div>
+                <paper-material elevation="1" class="vertical layout">
+                    <coffee-dropdown coffee="{{coffee}}" on-iron-select="enableAdd"></coffee-dropdown>
+                    <coffee-bag-size size="{{bagsize}}"></coffee-bag-size>
+                    <coffee-quantity quantity="{{quantity}}"></coffee-quantity>
+                    <paper-checkbox id="personal" checked="{{ispersonal}}">Personal Order</paper-checkbox>
+                    <person-dropdown disabled="{{!ispersonal}}" team="{{order.team}}" person="{{person}}"></person-dropdown>
+                    <paper-button id="addButton" raised disabled on-tap="add">Add</paper-button>
                 </paper-material>
             </div>
             <div class="flex-2 spaced">
                 <h4>Order Items</h4>
                 <paper-material elevation="1">
-                    <ul>
-                        <template is="dom-repeat" items="{{items}}">
-                            <li>
-                                <span>{{item.quantity}}</span>x
-                                <span>{{item.bagsize}}</span>#
-                                <strong>{{item.coffee.name}}</strong>
-                            </li>
-                        </template>
-                    </ul>
+                    <paper-tabs id="tabs" selected="{{selected}}">
+                        <paper-tab>Team</paper-tab>
+                        <paper-tab>Personal</paper-tab>
+                    </paper-tabs>
+                    <iron-pages selected="{{selected}}">
+                        <div>
+                            <ul>
+                                <template is="dom-repeat" items="{{teamitems}}">
+                                    <li class="horizontal layout center lineitem">
+                                        <order-lineitem item="{{item}}" on-remove-item="removeItem"></order-lineitem>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                        <div>
+                            <ul>
+                                <template is="dom-repeat" items="{{personalitems}}">
+                                    <li class="horizontal layout center lineitem">
+                                        <order-lineitem item="{{item}}" on-remove-item="removeItem"></order-lineitem>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                    </iron-pages>
                 </paper-material>
             </div>
         </div>
@@ -58,15 +76,50 @@
 <script>
     Polymer({
         is: 'order-view',
+        behaviors: [],
         properties: {
-            order: Object,
+            order: {
+                type: Object,
+                observer: 'orderChanged'
+            },
             team: Object
         },
-        toDate: (t) => new Date(t).toLocaleDateString(),
-        add: function (e) {
-            this.$.fbitems.add({
-
+        ready: function () {
+            // attempted workaround for https://github.com/PolymerElements/paper-tabs/issues/31
+            this.async(function () {
+                this.$.tabs.select(0);
+                this.$.tabs._tabChanged();
             });
+        },
+        orderChanged: function (o) {
+            console.log(this.order);
+        },
+        toDate: (t) => new Date(t).toLocaleDateString(),
+        enableAdd: function () {
+            this.$.addButton.disabled = false;
+        },
+        add: function () {
+            var item = {
+                order: this.order.__firebaseKey__,
+                coffee: this.coffee.__firebaseKey__,
+                quantity: parseInt(this.quantity),
+                size: parseInt(this.bagsize),
+                personal: this.ispersonal
+            };
+
+            if (this.ispersonal && this.person) {
+                item['person'] = this.person.__firebaseKey__;
+            }
+
+            var collection = this.ispersonal ? this.$.personalitems : this.$.teamitems;
+            collection.add(item);
+        },
+        removeItem: function (e) {
+            var item = e.detail;
+            if (item.personal)
+                this.$.personalitems.remove(item);
+            else
+                this.$.teamitems.remove(item);
         }
     });
 </script>

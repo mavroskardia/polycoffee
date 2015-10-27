@@ -6,15 +6,22 @@
         paper-card.selected { background-color: var(--primary-background-color); }
     </style>
     <template>
-        <firebase-collection id="fbitems"
-            location="https://swcoffee.firebaseio.com/items/"
+        <firebase-collection id="personalitems"
+            location="https://swcoffee.firebaseio.com/personalitems/"
             order-by-child="order"
             equal-to="[[order.__firebaseKey__]]"
-            data="{{items}}">
+            data="{{personalitems}}">
+        </firebase-collection>
+        <firebase-collection id="teamitems"
+            location="https://swcoffee.firebaseio.com/teamitems/"
+            order-by-child="order"
+            equal-to="[[order.__firebaseKey__]]"
+            data="{{teamitems}}">
         </firebase-collection>
         <paper-card id="card" heading="{{toDate(order.date)}}" image="" elevation="1" animated-shadow="false">
-            <div class="card-content">
-                <span><span>{{items.length}}</span> items in this order</span>
+            <div class="card-content vertical layout">
+                <div><span>{{teamitems.length}}</span> team items</div>
+                <div><span>{{personalitems.length}}</span> personal items</div>
             </div>
             <div class="card-actions">
                 <template is="dom-if" if="{{isOpen(order)}}">
