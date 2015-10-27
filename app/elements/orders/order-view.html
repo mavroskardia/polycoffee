@@ -1,8 +1,6 @@
 <dom-module id="order-view">
     <style>
-        fieldset {
-            border: none;
-        }
+        neon-animated-pages, neon-animatable { display: block; }
         paper-material { padding: 1rem; }
         .spaced { margin: 0 0.5rem; }
         #fields > * { margin: 0.5rem 0; }
@@ -32,24 +30,28 @@
         <div class="horizontal layout wrap">
             <div class="spaced">
                 <h4>Add to Order</h4>
-                <paper-material elevation="1" class="vertical layout">
+                <paper-material elevation="1">
                     <coffee-dropdown coffee="{{coffee}}" on-iron-select="enableAdd"></coffee-dropdown>
                     <coffee-bag-size size="{{bagsize}}"></coffee-bag-size>
                     <coffee-quantity quantity="{{quantity}}"></coffee-quantity>
-                    <paper-checkbox id="personal" checked="{{ispersonal}}">Personal Order</paper-checkbox>
+                    <div>
+                        <paper-checkbox id="personal" checked="{{ispersonal}}">Personal Order</paper-checkbox>
+                    </div>
                     <person-dropdown disabled="{{!ispersonal}}" team="{{order.team}}" person="{{person}}"></person-dropdown>
                     <paper-button id="addButton" raised disabled on-tap="add">Add</paper-button>
                 </paper-material>
             </div>
             <div class="flex-2 spaced">
                 <h4>Order Items</h4>
+                <paper-tabs id="tabs" selected="{{selected}}">
+                    <paper-tab>Team</paper-tab>
+                    <paper-tab>Personal</paper-tab>
+                </paper-tabs>
                 <paper-material elevation="1">
-                    <paper-tabs id="tabs" selected="{{selected}}">
-                        <paper-tab>Team</paper-tab>
-                        <paper-tab>Personal</paper-tab>
-                    </paper-tabs>
-                    <iron-pages selected="{{selected}}">
-                        <div>
+                    <neon-animated-pages class="flex" selected="[[selected]]"
+                        entry-animation="slide-from-right-animation"
+                        exit-animation="slide-left-animation">
+                        <neon-animatable>
                             <ul>
                                 <template is="dom-repeat" items="{{teamitems}}">
                                     <li class="horizontal layout center lineitem">
@@ -57,8 +59,8 @@
                                     </li>
                                 </template>
                             </ul>
-                        </div>
-                        <div>
+                        </neon-animatable>
+                        <neon-animatable>
                             <ul>
                                 <template is="dom-repeat" items="{{personalitems}}">
                                     <li class="horizontal layout center lineitem">
@@ -66,8 +68,8 @@
                                     </li>
                                 </template>
                             </ul>
-                        </div>
-                    </iron-pages>
+                        </neon-animatable>
+                    </neon-animated-pages>
                 </paper-material>
             </div>
         </div>
@@ -78,21 +80,15 @@
         is: 'order-view',
         behaviors: [],
         properties: {
-            order: {
-                type: Object,
-                observer: 'orderChanged'
-            },
+            order: Object,
             team: Object
         },
-        ready: function () {
+        attached: function () {
             // attempted workaround for https://github.com/PolymerElements/paper-tabs/issues/31
             this.async(function () {
                 this.$.tabs.select(0);
                 this.$.tabs._tabChanged();
             });
-        },
-        orderChanged: function (o) {
-            console.log(this.order);
         },
         toDate: (t) => new Date(t).toLocaleDateString(),
         enableAdd: function () {

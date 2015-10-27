@@ -57,6 +57,9 @@
             [].forEach.call(this.querySelectorAll('order-card'), e => e.selected = false);
             e.currentTarget.selected = true;
             this.$.orderview.classList.remove('hidden');
+            this.async(function () {
+                this.$.orderview.$.tabs.select(0);
+            });
         }
     });
 </script>
