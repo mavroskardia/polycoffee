@@ -1,0 +1,54 @@
+<dom-module id="order-totals">
+    <style>
+    </style>
+    <template>
+        <span>Total weight: <strong>{{weight}}</strong> lbs.</span>
+        <span>Total cost: $<strong>{{cost}}</strong></span>
+        <span>Team share: $<strong>{{share}}</strong></span>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'order-totals',
+        properties: {
+            order: {
+                type: Object,
+                observer: '_orderChanged'
+            }
+        },
+        ready: function () {
+            this.teamitemsref = new Firebase('https://swcoffee.firebaseio.com/teamitems');
+            this.personalitemsref = new Firebase('https://swcoffee.firebaseio.com/personalitems');
+            this.inventoryref = new Firebase('https://swcoffee.firebaseio.com/inventory');
+        },
+        _orderChanged: function (newOrder) {
+            this.calculateTotals(newOrder);
+        },
+        calculateTotals: function (order) {
+            this.calculateTeamTotal(order);
+            this.calculatePersonalTotal(order);
+            this.calculateWeight(order);
+            this.calculateTeamShare(order);
+        },
+        calculateTeamTotal: function (order) {
+            this.share = 0.0;
+
+            this.teamitemsref.orderByChild('order').equalTo(order.__firebaseKey__).on('child_added', function (ss) {
+                var item = ss.val();
+                this.inventoryref.child(item.coffee).on('value', function (sss) {
+                    var inv = sss.val();
+                    this.share += parseFloat(inv.price.substr(1)) * parseInt(item.quantity);
+                }.bind(this));
+            }.bind(this));
+        },
+        calculatePersonalTotal: function (order) {
+
+        },
+        calculateWeight: function (order) {
+
+        },
+        calculateTeamShare: function (order) {
+
+        }
+    });
+</script>

@@ -1,12 +1,12 @@
 <dom-module id="order-view">
     <style>
-        neon-animated-pages, neon-animatable { display: block; }
         paper-material { padding: 1rem; }
         .spaced { margin: 0 0.5rem; }
         #fields > * { margin: 0.5rem 0; }
         coffee-dropdown, person-dropdown { display: block; }
-        .lineitem { border-bottom: solid 1px #eee; }
-        .lineitem order-lineitem { width: 100%; }
+        .lineitems li { border-bottom: solid 1px #eee; list-style: none; }
+        .lineitems li order-lineitem { width: 100%; }
+        #personal { display: block; }
     </style>
     <template>
         <firebase-collection id="teamitems"
@@ -25,7 +25,10 @@
 
         <h2>Order for <span>{{toDate(order.date)}}</span></h2>
 
-        <team-dropdown order="{{order}}"></team-dropdown>
+        <div class="layout horizontal">
+            <team-dropdown order="{{order}}"></team-dropdown>
+            <order-totals order="{{order}}"></order-totals>
+        </div>
 
         <div class="horizontal layout wrap">
             <div class="spaced">
@@ -34,9 +37,7 @@
                     <coffee-dropdown coffee="{{coffee}}" on-iron-select="enableAdd"></coffee-dropdown>
                     <coffee-bag-size size="{{bagsize}}"></coffee-bag-size>
                     <coffee-quantity quantity="{{quantity}}"></coffee-quantity>
-                    <div>
-                        <paper-checkbox id="personal" checked="{{ispersonal}}">Personal Order</paper-checkbox>
-                    </div>
+                    <paper-checkbox id="personal" checked="{{ispersonal}}">Personal Order</paper-checkbox>
                     <person-dropdown disabled="{{!ispersonal}}" team="{{order.team}}" person="{{person}}"></person-dropdown>
                     <paper-button id="addButton" raised disabled on-tap="add">Add</paper-button>
                 </paper-material>
@@ -48,28 +49,22 @@
                     <paper-tab>Personal</paper-tab>
                 </paper-tabs>
                 <paper-material elevation="1">
-                    <neon-animated-pages class="flex" selected="[[selected]]"
-                        entry-animation="slide-from-right-animation"
-                        exit-animation="slide-left-animation">
-                        <neon-animatable>
-                            <ul>
-                                <template is="dom-repeat" items="{{teamitems}}">
-                                    <li class="horizontal layout center lineitem">
-                                        <order-lineitem item="{{item}}" on-remove-item="removeItem"></order-lineitem>
-                                    </li>
-                                </template>
-                            </ul>
-                        </neon-animatable>
-                        <neon-animatable>
-                            <ul>
-                                <template is="dom-repeat" items="{{personalitems}}">
-                                    <li class="horizontal layout center lineitem">
-                                        <order-lineitem item="{{item}}" on-remove-item="removeItem"></order-lineitem>
-                                    </li>
-                                </template>
-                            </ul>
-                        </neon-animatable>
-                    </neon-animated-pages>
+                    <iron-pages selected="[[selected]]">
+                        <ul class="lineitems">
+                            <template is="dom-repeat" items="{{teamitems}}">
+                                <li>
+                                    <order-lineitem item="{{item}}" on-remove-item="removeItem"></order-lineitem>
+                                </li>
+                            </template>
+                        </ul>
+                        <ul class="lineitems">
+                            <template is="dom-repeat" items="{{personalitems}}">
+                                <li>
+                                    <order-lineitem item="{{item}}" on-remove-item="removeItem"></order-lineitem>
+                                </li>
+                            </template>
+                        </ul>
+                    </iron-pages>
                 </paper-material>
             </div>
         </div>

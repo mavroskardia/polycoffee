@@ -5,8 +5,10 @@
             color: #888;
         }
         coffee-display {
-            font-style: oblique;
+            /*font-style: oblique;*/
         }
+        span { color: #888; }
+        strong { color: #444; }
     </style>
     <template>
         <div class="horizontal layout center">
@@ -14,8 +16,8 @@
                 <template is="dom-if" if="{{item.person}}">
                     <person-display ref="{{item.person}}"></person-display>
                 </template>
-                <strong>{{item.quantity}}</strong>&times;
-                <strong>{{item.size}}</strong>#
+                <span><strong>{{item.quantity}}</strong>&times;</span>
+                <span><strong>{{item.size}}</strong>#</span>
                 <coffee-display ref="{{item.coffee}}"></coffee-display>
             </div>
             <paper-icon-button icon="clear" class="end" on-tap="removeItem"></paper-icon-button>
