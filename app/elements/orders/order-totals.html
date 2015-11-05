@@ -1,5 +1,8 @@
 <dom-module id="order-totals">
     <style>
+        .weight { margin-right: 1rem; }
+        .numbers { text-align: right; }
+        .grand { border-top: solid 1px #ccc; }
     </style>
     <template>
         <firebase-collection
@@ -8,10 +11,22 @@
             equal-to="[[order.team]]"
             data="{{people}}">
         </firebase-collection>
-        <span>Total weight: <strong>{{totalWeight}}</strong> lbs.</span>
-        <span>Team: $<strong>{{formatAsCurrency(teamShare)}}</strong> / <strong>{{formatAsCurrency(teamTotal)}}</strong></span>
-        <span>Personal: $<strong>{{formatAsCurrency(personalTotal)}}</strong></span>
-        <span>Grand Total: $<strong>{{grandTotal(teamTotal, personalTotal)}}</strong></span>
+        <div class="horizontal layout">
+            <div class="weight">
+                <span>Total weight: <strong>{{totalWeight}}</strong> lbs.</span>
+            </div>
+            <div class="numbers">
+                <div class="team">
+                    <span>Team: $<strong>{{formatAsCurrency(teamShare)}}</strong> / <strong>{{formatAsCurrency(teamTotal)}}</strong></span>
+                </div>
+                <div class="personal">
+                    <span>Personal: $<strong>{{formatAsCurrency(personalTotal)}}</strong></span>
+                </div>
+                <div class="grand">
+                    <span>Grand Total: $<strong>{{grandTotal(teamTotal, personalTotal)}}</strong></span>
+                </div>
+            </div>
+        </div>
     </template>
 </dom-module>
 <script>

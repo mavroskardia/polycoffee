@@ -42,7 +42,10 @@
     Polymer({
         is: 'order-card',
         properties: {
-            order: Object,
+            order: {
+                type: Object,
+                notify: true
+            },
             selected: {
                 type: Boolean,
                 value: false,

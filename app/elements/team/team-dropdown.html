@@ -7,7 +7,7 @@
             data="{{teams}}">
         </firebase-collection>
 
-        <paper-dropdown-menu label="Team">
+        <paper-dropdown-menu label="Team" disabled="{{disabled}}">
             <paper-menu id="menu"
                 class="dropdown-content"
                 attr-for-selected="data-val"
@@ -28,6 +28,10 @@
             order: {
                 type: Object,
                 notify: true
+            },
+            disabled: {
+                type: Boolean,
+                value: false
             }
         },
         teamrefMatch: function (team) {

@@ -35,7 +35,10 @@
                     </template>
                 </div>
             </div>
-            <order-view id="orderview" selected="false" order="{{selectedOrder}}" class="hidden flex-3"></order-view>
+            <order-view id="orderview" class="hidden flex-3"
+                selected="false"
+                order="{{selectedOrder}}">
+            </order-view>
         </div>
     </template>
 </dom-module>
@@ -43,23 +46,25 @@
     Polymer({
         is: 'ordering-subapp',
         properties: {
-            selectedOrder: Object
+            selectedOrder: {
+                type: Object,
+                notify: true
+            }
         },
         add: function () {
             this.$.fb.add({
                 date: new Date().getTime(),
                 status: 'open',
-                items: [],
+                items: []
             });
         },
         show: function (e) {
-            this.selectedOrder = e.currentTarget.order;
             [].forEach.call(this.querySelectorAll('order-card'), e => e.selected = false);
             e.currentTarget.selected = true;
-            this.$.orderview.classList.remove('hidden');
-            this.async(function () {
-                this.$.orderview.$.tabs.select(0);
-            });
+            this.selectedOrder = e.currentTarget.order;
+
+            if (this.$.orderview)
+                this.$.orderview.classList.remove('hidden');
         }
     });
 </script>
