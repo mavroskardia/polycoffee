@@ -38,11 +38,6 @@
                 observer: '_orderChanged'
             }
         },
-        ready: function () {
-            this.teamitemsref = new Firebase('https://swcoffee.firebaseio.com/teamitems');
-            this.personalitemsref = new Firebase('https://swcoffee.firebaseio.com/personalitems');
-            this.inventoryref = new Firebase('https://swcoffee.firebaseio.com/inventory');
-        },
         _orderChanged: function (newOrder) {
             if (!newOrder) return;
             this.calculateTotals(newOrder);
@@ -57,9 +52,12 @@
             this.share = 0.0;
             this.totalWeight = 0.0;
 
-            this.teamitemsref.orderByChild('order').equalTo(order.__firebaseKey__).on('child_added', function (ss) {
+            var teamref = new Firebase('https://swcoffee.firebaseio.com/teamitems');
+            var inventoryref = new Firebase('https://swcoffee.firebaseio.com/inventory');
+
+            teamref.orderByChild('order').equalTo(order.__firebaseKey__).on('child_added', function (ss) {
                 var item = ss.val();
-                this.inventoryref.child(item.coffee).on('value', function (sss) {
+                inventoryref.child(item.coffee).on('value', function (sss) {
                     var inv = sss.val();
                     this.teamTotal += parseFloat(inv.price.substr(1)) * parseInt(item.quantity);
                     this.totalWeight += item.size * item.quantity;
@@ -69,17 +67,22 @@
         calculatePersonalTotal: function (order) {
             this.personalTotal = 0.0;
 
-            this.personalitemsref.orderByChild('order').equalTo(order.__firebaseKey__).on('child_added', function (ss) {
+            var personalref = new Firebase('https://swcoffee.firebaseio.com/personalitems');
+            var inventoryref = new Firebase('https://swcoffee.firebaseio.com/inventory');
+
+            personalref.orderByChild('order').equalTo(order.__firebaseKey__).on('child_added', function (ss) {
                 var item = ss.val();
-                this.inventoryref.child(item.coffee).on('value', function (sss) {
+                inventoryref.child(item.coffee).on('value', function (sss) {
                     var inv = sss.val();
                     this.personalTotal += parseFloat(inv.price.substr(1)) * parseInt(item.quantity);
                     this.totalWeight += item.size * item.quantity;
                 }.bind(this));
             }.bind(this));
         },
-        calculateTeamShare: function (order) {
-            this.teamShare = this.teamTotal / this.people.length;
+        calculateTeamShare: function () {
+            if (this.people) {
+                this.teamShare = this.teamTotal / this.people.length;
+            }
         },
         grandTotal: function (team, personal) {
             return this.formatAsCurrency(team + personal);

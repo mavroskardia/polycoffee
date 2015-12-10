@@ -1,70 +1,33 @@
 <dom-module id="ordering-subapp">
     <style>
+        .hidden { display: none; }
+
         * { font-weight: 200; }
-        paper-fab {
-            position: fixed;
-            bottom: 1rem;
-            right: 2rem;
-        }
+
         order-card {
             display: inline-block;
             margin: 0.5rem;
             transition: flex-grow 1s linear;
             transition: flex-shrink 1s linear;
         }
-        .hidden { display: none; }
+
         order-view.hidden { opacity: 0; }
+
         order-view {
             opacity: 1;
             transition: opacity 0.5s ease-in;
         }
     </style>
     <template>
-        <firebase-collection id="fb"
-            location="https://swcoffee.firebaseio.com/orders"
-            data="{{orders}}">
-        </firebase-collection>
-
-        <div class="horizontal layout wrap">
-            <div class="flex">
-                <h2>Orders</h2>
-                <paper-fab icon="add" on-tap="add"></paper-fab>
-                <div class="layout horizonal wrap">
-                    <template is="dom-repeat" items="{{orders}}">
-                        <order-card order="{{item}}" on-tap="show"></order-card>
-                    </template>
-                </div>
-            </div>
-            <order-view id="orderview" class="hidden flex-3"
-                selected="false"
-                order="{{selectedOrder}}">
-            </order-view>
-        </div>
+        <order-card-list on-order-selected="show" selected-order="{{order}}"></order-card-list>
+        <order-view id="ov" class="hidden flex-3" order="{{order}}"></order-view>
     </template>
 </dom-module>
 <script>
     Polymer({
         is: 'ordering-subapp',
-        properties: {
-            selectedOrder: {
-                type: Object,
-                notify: true
-            }
-        },
-        add: function () {
-            this.$.fb.add({
-                date: new Date().getTime(),
-                status: 'open',
-                items: []
-            });
-        },
-        show: function (e) {
-            [].forEach.call(this.querySelectorAll('order-card'), e => e.selected = false);
-            e.currentTarget.selected = true;
-            this.selectedOrder = e.currentTarget.order;
-
-            if (this.$.orderview)
-                this.$.orderview.classList.remove('hidden');
+        show: function () {
+            this.$.ov.classList.remove('hidden');
         }
     });
 </script>

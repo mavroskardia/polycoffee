@@ -1,12 +1,13 @@
 <dom-module id="order-view">
     <style>
-        paper-material { padding: 1rem; }
+        .hidden { display: none; }
         .spaced { margin: 0 0.5rem; }
         #fields > * { margin: 0.5rem 0; }
+        #personal { display: block; }
+        paper-material { padding: 1rem; }
         coffee-dropdown, person-dropdown { display: block; }
         .lineitems li { border-bottom: solid 1px #eee; list-style: none; }
         .lineitems li order-lineitem { width: 100%; }
-        #personal { display: block; }
     </style>
     <template>
         <firebase-collection id="teamitems"
@@ -23,7 +24,15 @@
             data="{{personalitems}}">
         </firebase-collection>
 
-        <h2>Order for <span>{{toDate(order.date)}}</span> (<span>{{order.status}}</span>)</h2>
+        <h2 class="horizontal layout">
+            <div class="flex">
+                Order for <span>{{toDate(order.date)}}</span>
+            </div>
+            <order-action order="[[order]]"
+                on-order-closed="closeOrder"
+                on-order-paid="payOrder">
+            </order-action>
+        </h2>
 
         <div class="layout horizontal">
             <team-dropdown order="{{order}}" disabled="{{!isOpen}}" class="flex"></team-dropdown>
@@ -31,7 +40,7 @@
         </div>
 
         <div class="horizontal layout wrap">
-            <div class="spaced">
+            <div class="spaced" id="addbox">
                 <h4>Add to Order</h4>
                 <paper-material elevation="1">
                     <coffee-dropdown coffee="{{coffee}}" on-iron-select="enableAdd"></coffee-dropdown>
@@ -76,22 +85,28 @@
         properties: {
             order: {
                 type: Object,
+                notify: true,
                 observer: '_orderChanged'
             },
             team: Object
         },
-        ready: function () {
-            this.isOpen = false;
-            this.isClosed = false;
-            this.isPaid = false;
-        },
         _orderChanged: function () {
+            this.fb = new Firebase('https://swcoffee.firebaseio.com/orders/' + this.order.__firebaseKey__);
+
+            this.isOpen = this.order.status == 'open';
+            this.isClosed = this.order.status == 'closed';
+            this.isPaid = this.order.status == 'paid';
+
+            if (!this.isOpen) {
+                this.$.addbox.classList.add('hidden');
+            } else {
+                this.$.addbox.classList.remove('hidden');
+            }
+
             // workaround for https://github.com/PolymerElements/paper-tabs/issues/31
             this.async(function () {
-                this.isOpen = this.order.status == 'open';
-                this.isClosed = this.order.status == 'closed';
-                this.isPaid = this.order.status == 'paid';
                 this.$.tabs._tabChanged(this.$.teamtab, this.$.personaltab);
+                this.$.tabs.selected = 0;
             });
         },
         toDate: t => new Date(t).toLocaleDateString(),
@@ -120,6 +135,12 @@
                 this.$.personalitems.remove(item);
             else
                 this.$.teamitems.remove(item);
+        },
+        closeOrder: function () {
+            this.fb.update({'status': 'closed'});
+        },
+        payOrder: function () {
+            this.fb.update({'status': 'paid'});
         }
     });
 </script>

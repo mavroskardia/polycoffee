@@ -1,0 +1,57 @@
+<dom-module id="order-card-list">
+    <style>
+        order-card { margin: 0.5rem; }
+    </style>
+    <template>
+        <firebase-collection id="fb"
+            location="https://swcoffee.firebaseio.com/orders"
+            data="{{orders}}"
+            on-firebase-child-changed="orderChanged">
+        </firebase-collection>
+        <div class="horizontal layout wrap">
+            <template is="dom-repeat" items="{{orders}}">
+                <order-card order="{{item}}"></order-card>
+            </template>
+            <paper-button raised class="self-center" on-tap="add">New Order</paper-button>
+        </div>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'order-card-list',
+        properties: {
+            selectedOrder: {
+                type: Object,
+                notify: true
+            }
+        },
+        listeners: {
+            'order-selected': 'orderSelected'
+        },
+        orderSelected: function (e, order) {
+            [].forEach.call(this.querySelectorAll('order-card'), e => e.selected = false);
+            order.selected = true;
+            this.selectedOrder = order.order;
+        },
+        orderChanged: function (e, ref) {
+            var newSelected = null,
+                key = ref.childSnapshot.key();
+
+            this.orders
+                .filter(o=>o.__firebaseKey__ == key)
+                .forEach(() => {
+                    newSelected = ref.childSnapshot.val();
+                    newSelected.__firebaseKey__ = key;
+                });
+
+            this.selectedOrder = newSelected;
+        },
+        add: function () {
+            this.$.fb.add({
+                date: new Date().getTime(),
+                status: 'open',
+                items: []
+            });
+        }
+    });
+</script>

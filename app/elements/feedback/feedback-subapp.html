@@ -1,0 +1,40 @@
+<dom-module id="feedback-subapp">
+    <style>
+        * { font-weight: 200; }
+        paper-material > * {
+            margin: 1rem;
+        }
+    </style>
+    <template>
+        <firebase-collection id="fb"
+            location="https://swcoffee.firebaseio.com/feedback"
+            data="{{feedbacks}}">
+        </firebase-collection>
+        <header>
+            <h2>Feedback</h2>
+        </header>
+        <paper-material elevation="1">
+            <paper-textarea id="message" label="Please indicate what can be improved"></paper-textarea>
+            <paper-button raised on-tap="submit">Submit Feedback</paper-button>
+        </paper-material>
+
+        <h3>Recent Feedback</h3>
+        <template is="dom-repeat" items="{{feedbacks}}">
+            <p class="entry"><small>{{formatDate(item.date)}}</small> <span>{{item.message}}</span></p>
+        </template>
+        <paper-toast id="toast" text="Your feedback has been submitted. Thank you!"></paper-toast>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'feedback-subapp',
+        submit: function () {
+            this.$.fb.add({
+                message: this.$.message.value,
+                date: new Date().getTime()
+            });
+            this.$.toast.show();
+        },
+        formatDate: d => new Date(d).toLocaleDateString()
+    });
+</script>
