@@ -1,0 +1,16 @@
+<dom-module id="item-display">
+    <style></style>
+    <template><span>{{item.name}}</span></template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'item-display',
+        properties: {
+            ref: String
+        },
+        ready: function () {
+            var fb = new Firebase('https://swcoffee.firebaseio.com/inventory');
+            fb.orderByKey().equalTo(this.ref).limitToFirst(1).on('child_added', ss => this.item = ss.val());
+        }
+    });
+</script>

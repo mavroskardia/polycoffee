@@ -3,13 +3,48 @@
         * { font-weight: 200; }
     </style>
     <template>
+        <firebase-collection id="fb"
+            location="https://swcoffee.firebaseio.com/inventory"
+            data="{{items}}"
+            order-by-child="type"
+            equal-to="other">
+        </firebase-collection>
+
         <header>
             <h2>Equipment, parts, etc.</h2>
         </header>
+
+        <div>
+            <header>
+                <h3>Add Equipment, Part, etc.</h3>
+            </header>
+            <paper-input id="name" label="Name of item"></paper-input>
+            <paper-input id="cost" type="number" label="Cost of item"></paper-input>
+            <paper-button raised on-tap="add">Add</paper-button>
+        </div>
+
+        <ul>
+        <template is="dom-repeat" items="{{items}}">
+            <li><strong>{{item.name}}</strong><small>{{item.cost}}</small></li>
+        </template>
+        </ul>
+
     </template>
 </dom-module>
 <script>
     Polymer({
-        is: 'other-subapp'
+        is: 'other-subapp',
+        add: function () {
+            var part = {
+                name: this.$.name.value,
+                price: parseFloat(this.$.cost.value),
+                type: 'other'
+            };
+
+            this.$.fb.add(part);
+
+            this.$.name.value = '';
+            this.$.cost.value = '';
+        }
     });
 </script>

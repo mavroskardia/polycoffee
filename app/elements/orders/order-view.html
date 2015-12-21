@@ -8,6 +8,7 @@
         coffee-dropdown, person-dropdown { display: block; }
         .lineitems li { border-bottom: solid 1px #eee; list-style: none; }
         .lineitems li order-lineitem { width: 100%; }
+        order-action { margin-left: 1rem; }
     </style>
     <template>
         <firebase-collection id="teamitems"
@@ -24,40 +25,40 @@
             data="{{personalitems}}">
         </firebase-collection>
 
-        <h2 class="horizontal layout">
-            <div class="flex">
-                Order for <span>{{toDate(order.date)}}</span>
-            </div>
-            <order-action order="[[order]]"
+        <h2>Order for <span>{{toDate(order.date)}}</span></h2>
+
+        <div class="layout horizontal">
+            <team-dropdown order="{{order}}" disabled="{{!isOpen}}"></team-dropdown>
+            <order-action order="[[order]]" class="self-center"
                 on-order-closed="closeOrder"
                 on-order-paid="payOrder">
             </order-action>
-        </h2>
-
-        <div class="layout horizontal">
-            <team-dropdown order="{{order}}" disabled="{{!isOpen}}" class="flex"></team-dropdown>
-            <order-totals order="{{order}}"></order-totals>
         </div>
 
         <div class="horizontal layout wrap">
             <div class="spaced" id="addbox">
                 <h4>Add to Order</h4>
                 <paper-material elevation="1">
-                    <coffee-dropdown coffee="{{coffee}}" on-iron-select="enableAdd"></coffee-dropdown>
-                    <coffee-bag-size size="{{bagsize}}"></coffee-bag-size>
-                    <coffee-quantity quantity="{{quantity}}"></coffee-quantity>
-                    <paper-checkbox id="personal" checked="{{ispersonal}}">Personal Order</paper-checkbox>
-                    <person-dropdown disabled="{{!ispersonal}}" team="{{order.team}}" person="{{person}}"></person-dropdown>
+                    <inventory-dropdown item="{{orderitem}}" on-iron-select="enableAdd"></inventory-dropdown>
+                    <div id="coffeespecific" class="hidden">
+                        <coffee-bag-size size="{{bagsize}}"></coffee-bag-size>
+                        <coffee-quantity quantity="{{quantity}}"></coffee-quantity>
+                        <paper-checkbox id="personal" checked="{{ispersonal}}">Personal Order</paper-checkbox>
+                        <person-dropdown disabled="{{!ispersonal}}" person="{{person}}"></person-dropdown>
+                    </div>
+                    <div id="notcoffee" class="hidden">
+                        <paper-input type="number" label="Quantity" value="{{quantity}}"></paper-input>
+                    </div>
                     <paper-button id="addButton" raised disabled on-tap="add">Add</paper-button>
                 </paper-material>
             </div>
             <div class="flex-2 spaced">
                 <h4>Order Items</h4>
-                <paper-tabs id="tabs" selected="{{selected}}">
-                    <paper-tab id="teamtab">Team</paper-tab>
-                    <paper-tab id="personaltab">Personal</paper-tab>
-                </paper-tabs>
                 <paper-material elevation="1">
+                    <paper-tabs id="tabs" selected="{{selected}}">
+                        <paper-tab id="teamtab">Team</paper-tab>
+                        <paper-tab id="personaltab">Personal</paper-tab>
+                    </paper-tabs>
                     <iron-pages selected="[[selected]]">
                         <ul class="lineitems">
                             <template is="dom-repeat" items="{{teamitems}}">
@@ -111,16 +112,27 @@
         },
         toDate: t => new Date(t).toLocaleDateString(),
         enableAdd: function () {
+            if (this.orderitem.type == 'coffee') {
+                this.$.coffeespecific.classList.remove('hidden');
+                this.$.notcoffee.classList.add('hidden');
+            } else {
+                this.$.coffeespecific.classList.add('hidden');
+                this.$.notcoffee.classList.remove('hidden');
+                this.person = null;
+                this.ispersonal = false;
+            }
             this.$.addButton.disabled = false;
         },
         add: function () {
             var item = {
                 order: this.order.__firebaseKey__,
-                coffee: this.coffee.__firebaseKey__,
-                quantity: parseInt(this.quantity),
-                size: parseInt(this.bagsize),
-                personal: this.ispersonal
+                item: this.orderitem.__firebaseKey__,
+                quantity: parseInt(this.quantity)
             };
+
+            if (this.orderitem.type == 'coffee') {
+                item['size'] = parseInt(this.bagsize);
+            }
 
             if (this.ispersonal && this.person) {
                 item['person'] = this.person.__firebaseKey__;
@@ -128,6 +140,8 @@
 
             var collection = this.ispersonal ? this.$.personalitems : this.$.teamitems;
             collection.add(item);
+
+            this.$.coffeespecific.classList.add('hidden');
         },
         removeItem: function (e) {
             var item = e.detail;
@@ -135,6 +149,7 @@
                 this.$.personalitems.remove(item);
             else
                 this.$.teamitems.remove(item);
+            this.fire('order-needs-updating', this.order);
         },
         closeOrder: function () {
             this.fb.update({'status': 'closed'});

@@ -12,18 +12,25 @@
             data="{{people}}">
         </firebase-collection>
         <div class="horizontal layout">
-            <div class="weight">
+            <div class="weight vertical layout">
                 <span>Total weight: <strong>{{totalWeight}}</strong> lbs.</span>
+                <span>Team member share: <currency-display value="{{teamShare}}"></currency-display></span>
             </div>
             <div class="numbers">
                 <div class="team">
-                    <span>Team: $<strong>{{formatAsCurrency(teamShare)}}</strong> / <strong>{{formatAsCurrency(teamTotal)}}</strong></span>
+                    <span>
+                        Team: <currency-display value="{{teamTotal}}"></currency-display>
+                    </span>
                 </div>
                 <div class="personal">
-                    <span>Personal: $<strong>{{formatAsCurrency(personalTotal)}}</strong></span>
+                    <span>
+                        Personal: <currency-display value="{{personalTotal}}"></currency-display>
+                    </span>
                 </div>
                 <div class="grand">
-                    <span>Grand Total: $<strong>{{grandTotal(teamTotal, personalTotal)}}</strong></span>
+                    <span>
+                        Grand Total: <currency-display value="{{grandTotal(teamTotal, personalTotal)}}"></currency-display>
+                    </span>
                 </div>
             </div>
         </div>
@@ -43,24 +50,23 @@
             this.calculateTotals(newOrder);
         },
         calculateTotals: function (order) {
+            this.teamTotal = 0.0;
+            this.share = 0.0;
+            this.totalWeight = 0.0;
             this.calculateTeamTotal(order);
             this.calculatePersonalTotal(order);
             this.calculateTeamShare(order);
         },
         calculateTeamTotal: function (order) {
-            this.teamTotal = 0.0;
-            this.share = 0.0;
-            this.totalWeight = 0.0;
-
             var teamref = new Firebase('https://swcoffee.firebaseio.com/teamitems');
             var inventoryref = new Firebase('https://swcoffee.firebaseio.com/inventory');
 
             teamref.orderByChild('order').equalTo(order.__firebaseKey__).on('child_added', function (ss) {
                 var item = ss.val();
-                inventoryref.child(item.coffee).on('value', function (sss) {
+                inventoryref.child(item.item).on('value', function (sss) {
                     var inv = sss.val();
-                    this.teamTotal += parseFloat(inv.price.substr(1)) * parseInt(item.quantity);
-                    this.totalWeight += item.size * item.quantity;
+                    this.teamTotal += inv.price * parseInt(item.quantity);
+                    this.totalWeight += (item.size || 0) * item.quantity;
                 }.bind(this));
             }.bind(this));
         },
@@ -72,23 +78,21 @@
 
             personalref.orderByChild('order').equalTo(order.__firebaseKey__).on('child_added', function (ss) {
                 var item = ss.val();
-                inventoryref.child(item.coffee).on('value', function (sss) {
+                inventoryref.child(item.item).on('value', function (sss) {
                     var inv = sss.val();
-                    this.personalTotal += parseFloat(inv.price.substr(1)) * parseInt(item.quantity);
+                    this.personalTotal += inv.price * parseInt(item.quantity);
                     this.totalWeight += item.size * item.quantity;
                 }.bind(this));
             }.bind(this));
         },
         calculateTeamShare: function () {
-            if (this.people) {
-                this.teamShare = this.teamTotal / this.people.length;
-            }
+            if (this.people)
+                this.teamShare = (this.teamTotal / this.people.length) || 0.0;
+            else
+                this.teamShare = 0.0;
         },
         grandTotal: function (team, personal) {
-            return this.formatAsCurrency(team + personal);
-        },
-        formatAsCurrency: function (val) {
-            return val.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+            return team + personal;
         }
     });
 </script>

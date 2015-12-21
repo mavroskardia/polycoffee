@@ -1,0 +1,16 @@
+<dom-module id="currency-display">
+    <style></style>
+    <template><span>$</span><strong>{{asCurrency(value)}}</strong></template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'currency-display',
+        asCurrency: val => (val/100).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'),
+        properties: {
+            value: {
+                type: Number,
+                readonly: true
+            }
+        }
+    });
+</script>

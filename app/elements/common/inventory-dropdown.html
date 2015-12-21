@@ -1,4 +1,4 @@
-<dom-module id="coffee-dropdown">
+<dom-module id="inventory-dropdown">
     <style>
         paper-dropdown-menu {
             display: block;
@@ -18,16 +18,16 @@
     <template>
         <firebase-collection id="fb"
             location="https://swcoffee.firebaseio.com/inventory"
-            data="{{coffees}}">
+            data="{{inventory}}">
         </firebase-collection>
-        <paper-dropdown-menu label="Coffee">
+        <paper-dropdown-menu label="Item to add to order">
             <paper-menu id="menu" class="dropdown-content"
                 on-iron-select="select">
-                <template is="dom-repeat" items="{{coffees}}">
+                <template is="dom-repeat" items="{{inventory}}">
                     <paper-item>
                         <paper-item-body class="horizontal layout">
                             <span class="flex">{{item.name}}</span>
-                            <em>{{item.price}}</em>
+                            <em><currency-display value="{{item.price}}"></currency-display></em>
                         </paper-item-body>
                     </paper-item>
                 </template>
@@ -37,16 +37,16 @@
 </dom-module>
 <script>
     Polymer({
-        is: 'coffee-dropdown',
+        is: 'inventory-dropdown',
         properties: {
-            coffee: {
+            item: {
                 type: Object,
                 notify: true
             }
         },
         select: function () {
-            this.coffee = this.coffees[parseInt(this.$.menu.selected)];
-            this.fire('iron-select', this.coffee);
+            this.item = this.inventory[parseInt(this.$.menu.selected)];
+            this.fire('iron-select', this.item);
         }
     });
 </script>

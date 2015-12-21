@@ -29,10 +29,12 @@
     Polymer({
         is: 'feedback-subapp',
         submit: function () {
+            if (this.$.message.value.trim() == '') return;
             this.$.fb.add({
                 message: this.$.message.value,
                 date: new Date().getTime()
             });
+            this.$.message.value = '';
             this.$.toast.show();
         },
         formatDate: d => new Date(d).toLocaleDateString()

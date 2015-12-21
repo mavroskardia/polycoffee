@@ -1,12 +1,8 @@
 <dom-module id="order-action">
-    <style>
-        :host {
-            font-size: 0.8rem;
-        }
-    </style>
+    <style></style>
     <template>
         <template is="dom-if" if="{{isOpen(order)}}">
-            <paper-button raised on-tap="close">Close</paper-button>
+            <paper-button raised on-tap="close">Close Order</paper-button>
         </template>
         <template is="dom-if" if="{{isClosed(order)}}">
             <paper-button raised on-tap="pay">Pay</paper-button>

@@ -4,7 +4,7 @@
             font-size: 0.8rem;
             color: #888;
         }
-        coffee-display {
+        item-display {
             /*font-style: oblique;*/
         }
         span { color: #888; }
@@ -18,7 +18,8 @@
                 </template>
                 <span><strong>{{item.quantity}}</strong>&times;</span>
                 <span><strong>{{item.size}}</strong>#</span>
-                <coffee-display ref="{{item.coffee}}"></coffee-display>
+                <item-display ref="{{item.item}}"></item-display>
+                <currency-display value="{{item.price}}"></currency-display>
             </div>
             <paper-icon-button icon="clear" class="end" on-tap="removeItem"></paper-icon-button>
         </div>
