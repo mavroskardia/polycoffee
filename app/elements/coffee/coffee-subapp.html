@@ -21,6 +21,8 @@
         }
     </style>
     <template>
+        <paper-toast id="message"></paper-toast>
+
         <h2>Coffee</h2>
 
         <firebase-collection id="fb"
@@ -40,8 +42,7 @@
              on-response="handleResponse">
          </iron-ajax>
 
-        <paper-button raised on-tap="rescan">Scrape Sweetwater</paper-button>
-        <div id="message"></div>
+        <paper-button id="scrapebtn" raised on-tap="rescan">Scrape Sweetwater</paper-button>
 
         <ul class="horizontal layout start wrap">
             <template is="dom-repeat" items="{{coffees}}">
@@ -88,22 +89,25 @@
     Polymer({
         is: 'coffee-subapp',
         rescan: function () {
+            this.$.scrapebtn.enabled = false;
             var yql = encodeURIComponent('SELECT * FROM data.html.cssselect WHERE url="http://www.sweetwaterorganiccoffee.com/coffee/" AND css=".ProductList"');
             var queryuri = `https://query.yahooapis.com/v1/public/yql?q=${yql}&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys`;
-            this.$.ajax.url = queryuri;
+            this.$.ajax.url = queryuri;//newquery;
             this.$.ajax.generateRequest();
         },
         handleResponse: function (data) {
             var allprices = [];
             var query = data.detail.response.query;
 
-            new Firebase('https://swcoffee.firebaseio.com/inventory').remove();
-            new Firebase('https://swcoffee.firebaseio.com/prices').remove();
-
             if (!query.results) {
                 this.$.message.innerText = 'No results for query';
+                this.$.scrapebtn.enabled = true;
                 return;
             }
+
+            // TODO: cannot remove old coffees, need to de-activate them so old orders can still reference them!
+            this.deactivate('https://swcoffee.firebaseio.com/inventory');
+            this.deactivate('https://swcoffee.firebaseio.com/prices');
 
             query.results.results.ul.li.forEach(function (li) {
                 var names = li.div.filter(d => d.class.indexOf('ProductDetails') !== -1).map(d => d.strong.a.content);
@@ -131,6 +135,14 @@
             for (k in uniquePrices) {
                 this.$.fbprices.add(uniquePrices[k]);
             }
+
+            this.$.scrapebtn.enabled = true;
+            this.$.message.text = 'Successfully scraped Sweetwater';
+            this.$.message.open();
+        },
+        deactivate: function (url) {
+            var ref = new Firebase(url);
+            ref.update({ active: false });
         }
     });
 </script>

@@ -65,8 +65,10 @@
                 var item = ss.val();
                 inventoryref.child(item.item).on('value', function (sss) {
                     var inv = sss.val();
-                    this.teamTotal += inv.price * parseInt(item.quantity);
-                    this.totalWeight += (item.size || 0) * item.quantity;
+                    if (inv) {
+                        this.teamTotal += inv.price * parseInt(item.quantity);
+                        this.totalWeight += (item.size || 0) * item.quantity;
+                    }
                 }.bind(this));
             }.bind(this));
         },
@@ -80,8 +82,10 @@
                 var item = ss.val();
                 inventoryref.child(item.item).on('value', function (sss) {
                     var inv = sss.val();
-                    this.personalTotal += inv.price * parseInt(item.quantity);
-                    this.totalWeight += item.size * item.quantity;
+                    if (inv) {
+                        this.personalTotal += inv.price * parseInt(item.quantity);
+                        this.totalWeight += item.size * item.quantity;
+                    }
                 }.bind(this));
             }.bind(this));
         },

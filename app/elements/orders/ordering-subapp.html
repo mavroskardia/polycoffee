@@ -19,8 +19,10 @@
         }
     </style>
     <template>
-        <order-card-list on-order-selected="show" selected-order="{{order}}"></order-card-list>
-        <order-view id="ov" class="hidden flex-3" order="{{order}}"></order-view>
+        <div class="horizontal layout">
+            <order-card-list class="flex" on-order-selected="show" selected-order="{{order}}"></order-card-list>
+            <order-view id="ov" class="hidden flex-2" order="{{order}}"></order-view>
+        </div>
     </template>
 </dom-module>
 <script>

@@ -18,19 +18,17 @@
             data="{{teams}}">
         </firebase-collection>
 
-        <paper-fab icon="add" on-tap="add"></paper-fab>
-        <div class="horizontal layout wrap">
-            <div class="flex">
-                <header>
-                    <h2>Teams</h2>
-                </header>
-
-                <template is="dom-repeat" items="{{teams}}">
-                    <team-card team="{{item}}" on-tap="show"></team-card>
-                </template>
-            </div>
-            <team-view id="teamview" team="{{selectedTeam}}" class="hidden flex-2"></team-view>
+        <header>
+            <h2>Teams</h2>
+        </header>
+        
+        <div class="horizontal layout">
+            <template is="dom-repeat" items="{{teams}}">
+                <team-card team="{{item}}" on-tap="show"></team-card>
+            </template>
+            <paper-button raised on-tap="add" class="self-center">New Team</paper-button>            
         </div>
+        <team-view id="teamview" team="{{selectedTeam}}" class="hidden flex-3"></team-view>
     </template>
 </dom-module>
 <script>
