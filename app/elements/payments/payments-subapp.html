@@ -1,0 +1,150 @@
+<dom-module id="page-one">
+	<style>
+		:host {
+			display: block;
+		}
+		.block { display: inline-block; width: 300px; height: 300px; margin: 5px; background-color: #def; }
+	</style>
+	<template>
+		<div class="block" on-tap="pageTwo"></div>
+		<div class="block" on-tap="pageTwo"></div>
+		<div class="block" on-tap="pageTwo"></div>
+		<div class="block" on-tap="pageTwo"></div>
+		<div class="block" on-tap="pageTwo"></div>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'page-one',
+		behaviors: [ Polymer.NeonSharedElementAnimatableBehavior ],
+		properties: {
+			animationConfig: {
+				type: Object,
+				value: function () {
+					return {
+						'exit': [{
+							name: 'ripple-animation',
+							id: 'ripple',
+							fromPage: this
+						}, {
+							name: 'hero-animation',
+							id: 'hero',
+							fromPage: this
+						}]
+					}
+				}
+			}
+		},
+		pageTwo: function (e) {
+			var target = e.target;
+
+			this.sharedElements = {
+				'hero': target,
+				'ripple': target
+			};
+
+			this.animationConfig['exit'][0].gesture = {
+        		x: event.x,
+        		y: event.y
+  			};
+
+			this.fire('tile-click', {
+				tile: target
+			});
+		}
+	});
+</script>
+
+<dom-module id="page-two">
+	<style>
+		:host {
+			display: block;
+		}
+		#fixed { position: fixed; top: 0; left: 256px; height: 100vh; width: 100vw; background-color: #fff;  }
+		#card {
+			position: relative;
+			margin: 200px 100px 0;
+			height: 700px;
+			background-color: #def;
+		}
+	</style>
+	<template>
+		<header id="rippleTarget">
+			<h2>page two</h2>
+			<paper-button on-tap="switchBack">Back</paper-button>
+		</header>
+		<div id="card"></div>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'page-two',
+		behaviors: [ Polymer.NeonSharedElementAnimatableBehavior ],
+		properties: {
+			sharedElements: {
+				type: Object,
+				value: function () {
+					return {
+						'hero': this.$.card,
+						'ripple': this.$.fixed
+					}
+				}
+			},
+			animationConfig: {
+				type: Object,
+				value: function () {
+					return {
+						'entry': [{
+							name: 'ripple-animation',
+							id: 'ripple',
+							toPage: this
+						},
+						{
+							name: 'hero-animation',
+							id: 'hero',
+							toPage: this,
+							timing: {
+								delay: 150
+							}
+						}],
+						'exit': [{
+							name: 'fade-out-animation',
+							node: this.$.fixed
+						}, {
+							name: 'transform-animation',
+							transformFrom: 'none',
+							transformTo: 'translate(0px, -200vh) scale(0.9, 1)',
+							node: this.$.card
+						}]
+					}
+				}
+			}
+		},
+		switchBack: function () {
+			this.fire('back-click');
+		}
+	});
+</script>
+
+<dom-module id="payments-subapp">
+	<style>
+		* { font-weight: 200; }
+	</style>
+	<template>
+		<neon-animated-pages id="pages" selected="0">
+			<page-one on-tile-click="switchPage"></page-one>
+			<page-two on-back-click="switchBack"></page-two>
+		</neon-animated-pages>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'payments-subapp',
+		switchPage: function () {
+			this.$.pages.selected = 1;
+		},
+		switchBack: function () {
+			this.$.pages.selected = 0;
+		}
+	});
+</script>
