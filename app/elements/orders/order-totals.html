@@ -1,36 +1,43 @@
 <dom-module id="order-totals">
+    <style include="shared-styles"></style>
     <style>
-        .weight { margin-right: 1rem; }
-        .numbers { text-align: right; }
-        .grand { border-top: solid 1px #ccc; }
+        .data > * { margin: 0 0.25rem; }
     </style>
     <template>
-        <firebase-collection
-            location="https://swcoffee.firebaseio.com/people/"
-            order-by-child="team"
-            equal-to="[[order.team]]"
-            data="{{people}}">
-        </firebase-collection>
-        <div class="horizontal layout">
-            <div class="weight vertical layout">
-                <span>Total weight: <strong>{{totalWeight}}</strong> lbs.</span>
-                <span>Team member share: <currency-display value="{{teamShare}}"></currency-display></span>
+        <div class="horizontal layout data">
+            <div class="vertical layout">
+                <div class="horizontal layout">
+                    <span class="flex">Team Items: </span>
+                    <strong>{{numTeamItems}}</strong>
+                </div>
+                <div class="horizontal layout">
+                    <span class="flex">Personal Items: </span>
+                    <strong>{{numPersonalItems}}</strong>
+                </div>
             </div>
-            <div class="numbers">
-                <div class="team">
-                    <span>
-                        Team: <currency-display value="{{teamTotal}}"></currency-display>
-                    </span>
+            <div class="vertical layout">
+                <div class="horizontal layout">
+                    <span class="flex">Total weight: </span>
+                    <strong>{{totalWeight}}</strong>
+                    <span>#</span>
                 </div>
-                <div class="personal">
-                    <span>
-                        Personal: <currency-display value="{{personalTotal}}"></currency-display>
-                    </span>
+                <div class="horizontal layout">
+                    <span class="flex">Team member share: </span>
+                    <currency-display value="{{teamShare}}"></currency-display>
                 </div>
-                <div class="grand">
-                    <span>
-                        Grand Total: <currency-display value="{{grandTotal(teamTotal, personalTotal)}}"></currency-display>
-                    </span>
+            </div>
+            <div class="vertical layout flex">
+                <div class="horizontal layout">
+                    <span class="flex">Team: </span>
+                    <currency-display value="{{teamTotal}}"></currency-display>
+                </div>
+                <div class="horizontal layout">
+                    <span class="flex">Personal: </span>
+                    <currency-display value="{{personalTotal}}"></currency-display>
+                </div>
+                <div class="horizontal layout">
+                    <span class="flex">Grand: </span>
+                    <currency-display value="{{grandTotal(teamTotal, personalTotal)}}"></currency-display>
                 </div>
             </div>
         </div>
@@ -43,6 +50,22 @@
             order: {
                 type: Object,
                 observer: '_orderChanged'
+            },
+            totalWeight: {
+                type: Number,
+                value: () => 0
+            },
+            teamTotal: {
+                type: Number,
+                value: () => 0
+            },
+            teamShare: {
+                type: Number,
+                value: () => 0
+            },
+            personalTotal: {
+                type: Number,
+                value: () => 0
             }
         },
         _orderChanged: function (newOrder) {
@@ -50,50 +73,35 @@
             this.calculateTotals(newOrder);
         },
         calculateTotals: function (order) {
-            this.teamTotal = 0.0;
-            this.share = 0.0;
-            this.totalWeight = 0.0;
-            this.calculateTeamTotal(order);
-            this.calculatePersonalTotal(order);
-            this.calculateTeamShare(order);
-        },
-        calculateTeamTotal: function (order) {
-            var teamref = new Firebase('https://swcoffee.firebaseio.com/teamitems');
-            var inventoryref = new Firebase('https://swcoffee.firebaseio.com/inventory');
+            if (!order.items) return;
 
-            teamref.orderByChild('order').equalTo(order.__firebaseKey__).on('child_added', function (ss) {
-                var item = ss.val();
-                inventoryref.child(item.item).on('value', function (sss) {
-                    var inv = sss.val();
-                    if (inv) {
-                        this.teamTotal += inv.price * parseInt(item.quantity);
-                        this.totalWeight += (item.size || 0) * item.quantity;
-                    }
-                }.bind(this));
-            }.bind(this));
-        },
-        calculatePersonalTotal: function (order) {
-            this.personalTotal = 0.0;
+            var teamitems = order.items.filter(i => !i.personal);
 
-            var personalref = new Firebase('https://swcoffee.firebaseio.com/personalitems');
-            var inventoryref = new Firebase('https://swcoffee.firebaseio.com/inventory');
+            this.numTeamItems = teamitems.length;
 
-            personalref.orderByChild('order').equalTo(order.__firebaseKey__).on('child_added', function (ss) {
-                var item = ss.val();
-                inventoryref.child(item.item).on('value', function (sss) {
-                    var inv = sss.val();
-                    if (inv) {
-                        this.personalTotal += inv.price * parseInt(item.quantity);
-                        this.totalWeight += item.size * item.quantity;
-                    }
-                }.bind(this));
-            }.bind(this));
+            this.totalWeight = order.items
+                                    .map(i => i.size * i.quantity)
+                                    .reduce((a,b) => a + b, 0.0);
+
+            this.teamTotal = teamitems
+                                    .map(i => i.quantity * this.bagCost(i) * 100)
+                                    .reduce((a,b) => a + b, 0.0);
+
+            this.teamShare = this.teamTotal / order.people.filter(p => p.team == order.team).length;
+
+            var personalitems = order.items.filter(i => i.personal);
+
+            this.numPersonalItems = personalitems.length;
+
+            this.personalTotal = personalitems
+                                    .map(i => i.quantity * this.bagCost(i) * 100)
+                                    .reduce((a,b) => a + b, 0.0);
         },
-        calculateTeamShare: function () {
-            if (this.people)
-                this.teamShare = (this.teamTotal / this.people.length) || 0.0;
-            else
-                this.teamShare = 0.0;
+        bagCost: function (item) {
+            return this.order.prices
+                    .filter(p => p.retail == item.coffee.price)
+                    .map(p => p.wholesale[item.size == 1 ? 0 : item.size == 2 ? 1 : 2])
+                    .reduce((p,c)=> p + c, 0.0);
         },
         grandTotal: function (team, personal) {
             return team + personal;

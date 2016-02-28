@@ -1,35 +1,17 @@
 <dom-module id="ordering-subapp">
-    <style>
-        .hidden { display: none; }
-
-        * { font-weight: 200; }
-
-        order-card {
-            display: inline-block;
-            margin: 0.5rem;
-            transition: flex-grow 1s linear;
-            transition: flex-shrink 1s linear;
-        }
-
-        order-view.hidden { opacity: 0; }
-
-        order-view {
-            opacity: 1;
-            transition: opacity 0.5s ease-in;
-        }
-    </style>
+    <style include="shared-styles"></style>
     <template>
-        <div class="horizontal layout">
-            <order-card-list class="flex" on-order-selected="show" selected-order="{{order}}"></order-card-list>
-            <order-view id="ov" class="hidden flex-2" order="{{order}}"></order-view>
-        </div>
+        <iron-pages id="pages" selected="0">
+            <order-card-list on-order-selected="toggle" selected-order="{{order}}"></order-card-list>
+            <order-view order="{{order}}" on-view-closed="toggle"></order-view>
+        </iron-pages>
     </template>
 </dom-module>
 <script>
     Polymer({
         is: 'ordering-subapp',
-        show: function () {
-            this.$.ov.classList.remove('hidden');
+        toggle: function () {
+            this.$.pages.selected = this.$.pages.selected == 0 ? 1 : 0;
         }
     });
 </script>

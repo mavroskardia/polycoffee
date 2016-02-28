@@ -1,11 +1,9 @@
 <dom-module id="order-lineitem">
+    <style include="shared-styles"></style>
     <style>
         person-display {
             font-size: 0.8rem;
             color: #888;
-        }
-        item-display {
-            /*font-style: oblique;*/
         }
         span { color: #888; }
         strong { color: #444; }
@@ -14,12 +12,12 @@
         <div class="horizontal layout center">
             <div class="flex">
                 <template is="dom-if" if="{{item.person}}">
-                    <person-display ref="{{item.person}}"></person-display>
+                    <strong>{{item.person.name}}</strong>
                 </template>
                 <span><strong>{{item.quantity}}</strong>&times;</span>
                 <span><strong>{{item.size}}</strong>#</span>
-                <item-display ref="{{item.item}}"></item-display>
-                <currency-display value="{{item.price}}"></currency-display>
+                <strong>{{item.coffee.name}}</strong>
+                <currency-display value="{{item.coffee.price}}"></currency-display>
             </div>
             <paper-icon-button icon="clear" class="end" on-tap="removeItem"></paper-icon-button>
         </div>

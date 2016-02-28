@@ -1,0 +1,79 @@
+<dom-module id="order-prices">
+    <style include="shared-styles"></style>
+    <style>
+        paper-card { width: 100%; height: 100%; }
+        .priceblock { margin: 0 0.25rem; }
+    </style>
+    <template>
+        <paper-card heading="Wholesale Prices">
+            <div class="card-contents">
+                <iron-pages selected="{{selected}}">
+                    <section id="tiles" class="horizontal justified layout wrap">
+                        <template is="dom-repeat" items="{{order.prices}}">
+                            <paper-button on-tap="zoom" raised>
+                                <currency-display class="center-center" value="[[item.retail]]"></currency-display>
+                            </paper-button>
+                        </template>
+                    </section>
+                    <section id="detail">
+                        <paper-icon-button icon="arrow-back" on-tap="unzoom"></paper-icon-button>
+                        <strong><currency-display value="{{editingPrice.retail}}"></currency-display></strong>
+                        <paper-input
+                            type="number"
+                            label="One pound price"
+                            value="{{editingPrice.wholesale.0}}"
+                            on-change="updatePrice">
+                            <div prefix>$</div>
+                        </paper-input>
+                        <paper-input
+                            type="number"
+                            label="Two pound price"
+                            value="{{editingPrice.wholesale.1}}"
+                            on-change="updatePrice">
+                            <div prefix>$</div>
+                        </paper-input>
+                        <paper-input
+                            type="number"
+                            label="Five pound price"
+                            value="{{editingPrice.wholesale.2}}"
+                            on-change="updatePrice">
+                            <div prefix>$</div>
+                        </paper-input>
+                    </section>
+                </iron-pages>
+            </div>
+        </paper-card>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'order-prices',
+        properties: {
+            order: Object,
+            selected: {
+                type: Number,
+                value: function () {
+                    return 0;
+                }
+            }
+        },
+        zoom: function (e) {
+            this.selected = 1;
+            this.editingPrice = e.model.item;
+        },
+        unzoom: function () {
+            this.selected = 0;
+        },
+        updatePrice: function (e) {
+            var path = [
+                'order', 'prices',
+                this.order.prices.indexOf(this.editingPrice),
+                'wholesale',
+                this.editingPrice.wholesale.indexOf(e.target.value)
+            ].join('.');
+
+            this.set(path, parseFloat(e.target.value));
+            this.fire('price-update');
+        }
+    });
+</script>

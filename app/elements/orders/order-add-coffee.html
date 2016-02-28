@@ -1,0 +1,68 @@
+<dom-module id="order-add-coffee">
+    <style include="shared-styles"></style>
+    <style>
+        paper-material > * {
+            margin: 0.25rem 0;
+        }
+    </style>
+    <template>
+        <paper-card class="white" heading="Add Coffee" image="/images/coffeecup2rs.jpg" elevation="1">
+            <div class="card-contents vertical layout">
+                <paper-tabs selected="{{selected}}">
+                    <paper-tab>Coffee</paper-tab>
+                    <paper-tab>Other</paper-tab>
+                </paper-tabs>
+                <iron-pages selected="{{selected}}">
+                    <section class="vertical layout">
+                        <inventory-dropdown on-iron-select="onAddCoffee" item="{{coffee}}" inventory="[[coffees]]"></inventory-dropdown>
+                        <coffee-bag-size size="{{bagsize}}"></coffee-bag-size>
+                        <coffee-quantity quantity="{{quantity}}"></coffee-quantity>
+                        <paper-checkbox id="personal" checked="{{ispersonal}}">Personal Order</paper-checkbox>
+                        <person-dropdown disabled="{{!ispersonal}}" person="{{person}}"></person-dropdown>
+                    </section>
+                    <section>
+                        <em>All fields required</em>
+                        <paper-input id="name" label="Name" on-change="checkCanAdd"></paper-input>
+                        <paper-input id="description" label="Description" on-change="checkCanAdd"></paper-input>
+                        <paper-input id="price" type="number" min="0" label="Price" on-change="checkCanAdd"></paper-input>
+                        <paper-input id="quantity" value="1" min="0" type="number" label="Quantity" on-change="checkCanAdd"></paper-input>
+                    </section>
+                </iron-pages>
+            </div>
+            <div class="card-actions">
+                <paper-button id="addButton" disabled on-tap="add">Add</paper-button>
+            </div>
+        </paper-card>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'order-add-coffee',
+        properties: {
+            prices: Array,
+            coffees: Array
+        },
+        onAddCoffee: function (e) {
+            this.$.addButton.disabled = false;
+        },
+        calculateCostPerBag: function (coffee, bagsize) {
+            var v = this.prices
+                        .filter(p => p.retail == coffee.price)
+                        .map(p => p.wholesale[bagsize == 1 ? 0 : bagsize == 2 ? 1 : 2])
+                        .reduce((p,c)=> p + c);
+            return v;
+        },
+        add: function () {
+            var lineitem = {
+                coffee: this.coffee,
+                quantity: this.quantity,
+                size: this.bagsize,
+                personal: this.ispersonal,
+                person: this.person || null,
+                bagcost: this.calculateCostPerBag(this.coffee, this.bagsize)
+            };
+
+            this.fire('add-coffee', lineitem);
+        }
+    });
+</script>

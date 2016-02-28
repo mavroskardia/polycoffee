@@ -18,29 +18,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     // Middleware
     function scrollToTop(ctx, next) {
-      app.scrollPageToTop();
-      next();
+        app.scrollPageToTop();
+        next();
     }
 
     // Routes
-    page('/', scrollToTop, function() {
-      app.route = 'orders';
+    page('/', scrollToTop, function () {
+        app.route = 'orders';
+    });
+
+    page('/orders', scrollToTop, function() {
+        app.route = 'orders';
+        // not a good place to put this, but meh
+        document.querySelector('ordering-subapp').$.pages.selected = 0;
     });
 
     page('/coffee', scrollToTop, function() {
-      app.route = 'coffee';
+        app.route = 'coffee';
     });
 
     page('/other', scrollToTop, function() {
-      app.route = 'other';
+        app.route = 'other';
     });
 
     page('/teams', scrollToTop, function() {
-      app.route = 'teams';
+        app.route = 'teams';
     });
 
     page('/payments', scrollToTop, function() {
-      app.route = 'payments';
+        app.route = 'payments';
     });
 
     // page('/users/:name', scrollToTop, function(data) {
@@ -49,12 +55,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     // });
 
     page('/feedback', scrollToTop, function() {
-      app.route = 'feedback';
+        app.route = 'feedback';
     });
 
     // add #! before urls
     page({
-      hashbang: true
+        hashbang: false
     });
 
   });

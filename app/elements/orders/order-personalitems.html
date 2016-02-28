@@ -1,0 +1,48 @@
+<dom-module id="order-personalitems">
+    <style include="shared-styles"></style>
+    <style>
+        paper-card { width: 30rem; }
+        .items > * { padding: 0.25rem; }
+        .name { width: 4rem; }
+    </style>
+    <template>
+        <paper-card heading="Personal Items" elevation="1">
+            <div class="card-contents">
+                <template is="dom-repeat" items="{{getPersonalItems(order)}}">
+                    <div class="horizontal layout items center">
+                        <truncate-text class="name self-center" text="{{item.person.name}}"></truncate-text>
+                        <div class="self-center">
+                            {{item.quantity}}<span>&times;</span>
+                        </div>
+                        <div class="self-center">
+                            {{item.size}}<span>#</span>
+                        </div>
+                        <truncate-text class="self-center" text="{{item.coffee.name}}"></truncate-text>
+                        <currency-display class="self-center" value="{{getTotalCost(item)}}"></currency-display>
+                        <small>(<currency-display value="{{item.coffee.price}}"></currency-display>)</small>
+                        <paper-icon-button class="self-center" icon="clear" on-tap="removeItem"></paper-icon-button>
+                    </div>
+                </template>
+            </div>
+        </paper-card>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'order-personalitems',
+        properties: {
+            order: Object
+        },
+        removeItem: function (e) {
+            this.fire('remove-item', e.model.item);
+        },
+        bagCost: function (item) {
+            return this.order.prices
+                    .filter(p => p.retail == item.coffee.price)
+                    .map(p => p.wholesale[item.size == 1 ? 0 : item.size == 2 ? 1 : 2])
+                    .reduce((p,c)=> p + c, 0.0);
+        },
+        getTotalCost: function (item) { return this.bagCost(item) * item.quantity * 100 },
+        getPersonalItems: order => [].filter.call(order.items || [], i => i.personal)
+    });
+</script>

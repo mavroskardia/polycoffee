@@ -1,11 +1,11 @@
 <dom-module id="order-action">
-    <style></style>
+    <style include="shared-styles"></style>
     <template>
         <template is="dom-if" if="{{isOpen(order)}}">
-            <paper-button raised on-tap="close">Close Order</paper-button>
+            <paper-button on-tap="close">Close Order</paper-button>
         </template>
         <template is="dom-if" if="{{isClosed(order)}}">
-            <paper-button raised on-tap="pay">Pay</paper-button>
+            <paper-button on-tap="pay">Pay</paper-button>
         </template>
         <template is="dom-if" if="{{isPaid(order)}}">
             <strong>Paid</strong>

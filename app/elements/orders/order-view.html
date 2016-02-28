@@ -1,161 +1,114 @@
 <dom-module id="order-view">
+    <style include="shared-styles"></style>
     <style>
-        .hidden { display: none; }
-        .spaced { margin: 0 0.5rem; }
-        #fields > * { margin: 0.5rem 0; }
-        #personal { display: block; }
-        paper-material { padding: 1rem; }
-        coffee-dropdown, person-dropdown { display: block; }
-        .lineitems li { border-bottom: solid 1px #eee; list-style: none; }
-        .lineitems li order-lineitem { width: 100%; }
-        order-action { margin-left: 1rem; }
+        :host {
+            position: relative;
+        }
+
+        order-add-coffee,
+        order-add-other,
+        order-teamitems,
+        order-personalitems,
+        order-prices,
+        paper-card
+        { margin: 0 0.5rem 0.25rem; }
+
+        paper-icon-button {
+            position: absolute;
+            top: 14px;
+            left: -50px;
+        }
+
+        paper-tabs {
+            margin-bottom: 1rem;
+        }
     </style>
     <template>
-        <firebase-collection id="teamitems"
-            location="https://swcoffee.firebaseio.com/teamitems"
-            order-by-child="order"
-            equal-to="[[order.__firebaseKey__]]"
-            data="{{teamitems}}">
-        </firebase-collection>
-
-        <firebase-collection id="personalitems"
-            location="https://swcoffee.firebaseio.com/personalitems"
-            order-by-child="order"
-            equal-to="[[order.__firebaseKey__]]"
-            data="{{personalitems}}">
-        </firebase-collection>
-
-        <h2>Order for <span>{{toDate(order.date)}}</span></h2>
-
-        <div class="layout horizontal">
-            <team-dropdown order="{{order}}" disabled="{{!isOpen}}"></team-dropdown>
-            <order-action order="[[order]]" class="self-center"
-                on-order-closed="closeOrder"
-                on-order-paid="payOrder">
-            </order-action>
-        </div>
-
-        <div class="horizontal layout wrap">
-            <div class="spaced" id="addbox">
-                <h4>Add to Order</h4>
-                <paper-material elevation="1">
-                    <inventory-dropdown item="{{orderitem}}" on-iron-select="enableAdd"></inventory-dropdown>
-                    <div id="coffeespecific" class="hidden">
-                        <coffee-bag-size size="{{bagsize}}"></coffee-bag-size>
-                        <coffee-quantity quantity="{{quantity}}"></coffee-quantity>
-                        <paper-checkbox id="personal" checked="{{ispersonal}}">Personal Order</paper-checkbox>
-                        <person-dropdown disabled="{{!ispersonal}}" person="{{person}}"></person-dropdown>
-                    </div>
-                    <div id="notcoffee" class="hidden">
-                        <paper-input type="number" label="Quantity" value="{{quantity}}"></paper-input>
-                    </div>
-                    <paper-button id="addButton" raised disabled on-tap="add">Add</paper-button>
-                </paper-material>
+        <paper-icon-button icon="arrow-back" on-tap="closeView"></paper-icon-button>
+        <header class="horizontal layout">
+            <h2 class="flex">Order for <span>{{toDate(order.date)}}</span></h2>
+            <div class="end self-center">
+                <team-dropdown order="{{order}}" disabled="{{!isOpen}}"></team-dropdown>
+                <order-action order="[[order]]" class="self-center"
+                    on-order-closed="closeOrder"
+                    on-order-paid="payOrder">
+                </order-action>
             </div>
-            <div class="flex-2 spaced">
-                <h4>Order Items</h4>
-                <paper-material elevation="1">
-                    <paper-tabs id="tabs" selected="{{selected}}">
-                        <paper-tab id="teamtab">Team</paper-tab>
-                        <paper-tab id="personaltab">Personal</paper-tab>
-                    </paper-tabs>
-                    <iron-pages selected="[[selected]]">
-                        <ul class="lineitems">
-                            <template is="dom-repeat" items="{{teamitems}}">
-                                <li>
-                                    <order-lineitem item="{{item}}" on-remove-item="removeItem"></order-lineitem>
-                                </li>
-                            </template>
-                        </ul>
-                        <ul class="lineitems">
-                            <template is="dom-repeat" items="{{personalitems}}">
-                                <li>
-                                    <order-lineitem item="{{item}}" on-remove-item="removeItem"></order-lineitem>
-                                </li>
-                            </template>
-                        </ul>
-                    </iron-pages>
-                </paper-material>
+        </header>
+
+        <paper-tabs selected="{{selected}}">
+            <paper-tab>Order</paper-tab>
+            <paper-tab>Coffees</paper-tab>
+        </paper-tabs>
+
+        <iron-pages selected="{{selected}}">
+            <div class="tiles layout horizontal wrap start">
+                <order-add-item
+                    coffees="{{order.inventory}}"
+                    prices="{{order.prices}}"
+                    on-add-coffee="addItemToOrder"
+                    on-add-other="addItemToOrder">
+                </order-add-item>
+                <div class="layout vertical">
+                    <order-teamitems order="{{order}}" on-remove-item="removeItem"></order-teamitems>
+                    <order-personalitems order="{{order}}" on-remove-item="removeItem"></order-personalitems>
+                    <paper-card heading="Order Totals">
+                        <div class="card-contents">
+                            <order-totals order="{{order}}"></order-totals>
+                        </div>
+                    </paper-card>
+                </div>
             </div>
-        </div>
+            <section>
+                <order-prices order="{{order}}" on-price-update="updateOrder"></order-prices>
+            </section>
+            <section></section>
+        </iron-pages>
     </template>
 </dom-module>
 <script>
     Polymer({
         is: 'order-view',
         properties: {
+            team: Object,
             order: {
                 type: Object,
                 notify: true,
                 observer: '_orderChanged'
             },
-            team: Object
+            selected: {
+                type: Number,
+                value: () => 0
+            }
+        },
+        removeItem: function (e, item) {
+            var idx = this.order.items.indexOf(item);
+            if (idx > -1) {
+                this.splice('order.items', idx, 1);
+                this.updateOrder();
+            }
+        },
+        updateOrder: function () {
+            this.fb.update(this.order);
         },
         _orderChanged: function () {
+            if (!this.order) return;
             this.fb = new Firebase('https://swcoffee.firebaseio.com/orders/' + this.order.__firebaseKey__);
-
-            this.isOpen = this.order.status == 'open';
-            this.isClosed = this.order.status == 'closed';
-            this.isPaid = this.order.status == 'paid';
-
-            if (!this.isOpen) {
-                this.$.addbox.classList.add('hidden');
-            } else {
-                this.$.addbox.classList.remove('hidden');
-            }
-
-            // workaround for https://github.com/PolymerElements/paper-tabs/issues/31
-            this.async(function () {
-                this.$.tabs._tabChanged(this.$.teamtab, this.$.personaltab);
-                this.$.tabs.selected = 0;
-            });
+        },
+        addItemToOrder: function (e, lineitem) {
+            if (!this.order.items) this.set('order.items', []);
+            this.push('order.items', lineitem);
+            this.updateOrder();
         },
         toDate: t => new Date(t).toLocaleDateString(),
-        enableAdd: function () {
-            if (this.orderitem.type == 'coffee') {
-                this.$.coffeespecific.classList.remove('hidden');
-                this.$.notcoffee.classList.add('hidden');
-            } else {
-                this.$.coffeespecific.classList.add('hidden');
-                this.$.notcoffee.classList.remove('hidden');
-                this.person = null;
-                this.ispersonal = false;
-            }
-            this.$.addButton.disabled = false;
-        },
-        add: function () {
-            var item = {
-                order: this.order.__firebaseKey__,
-                item: this.orderitem.__firebaseKey__,
-                quantity: parseInt(this.quantity)
-            };
-
-            if (this.orderitem.type == 'coffee') {
-                item['size'] = parseInt(this.bagsize);
-            }
-
-            if (this.ispersonal && this.person) {
-                item['person'] = this.person.__firebaseKey__;
-            }
-
-            var collection = this.ispersonal ? this.$.personalitems : this.$.teamitems;
-            collection.add(item);
-
-            this.$.coffeespecific.classList.add('hidden');
-        },
-        removeItem: function (e) {
-            var item = e.detail;
-            if (item.personal)
-                this.$.personalitems.remove(item);
-            else
-                this.$.teamitems.remove(item);
-            this.fire('order-needs-updating', this.order);
-        },
         closeOrder: function () {
             this.fb.update({'status': 'closed'});
         },
         payOrder: function () {
             this.fb.update({'status': 'paid'});
+        },
+        closeView: function () {
+            this.fire('view-closed');
         }
     });
 </script>

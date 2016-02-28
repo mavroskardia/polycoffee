@@ -1,10 +1,5 @@
 <dom-module id="feedback-subapp">
-    <style>
-        * { font-weight: 200; }
-        paper-material > * {
-            margin: 1rem;
-        }
-    </style>
+    <style include="shared-styles"></style>
     <template>
         <firebase-collection id="fb"
             location="https://swcoffee.firebaseio.com/feedback"
@@ -17,7 +12,7 @@
             <paper-textarea id="message" label="Please indicate what can be improved"></paper-textarea>
             <paper-button raised on-tap="submit">Submit Feedback</paper-button>
         </paper-material>
-        <h3>Recent Feedback</h3>            
+        <h3>Recent Feedback</h3>
         <template is="dom-repeat" items="{{feedbacks}}">
             <p class="entry"><small>{{formatDate(item.date)}}</small> <span>{{item.message}}</span></p>
         </template>

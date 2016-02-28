@@ -59,19 +59,19 @@
 
         <!-- Drawer Toolbar -->
         <paper-toolbar id="drawerToolbar">
-          <span class="paper-font-title">Menu</span>
+          <span class="paper-font-title">ITI Coffee Ordering</span>
         </paper-toolbar>
 
         <!-- Drawer Content -->
         <paper-menu class="list" attr-for-selected="data-route" selected="[[route]]">
-          <a data-route="home" href="/" on-tap="onDataRouteClick">
+          <a data-route="orders" href="/orders" on-tap="onDataRouteClick">
             <iron-icon icon="home"></iron-icon>
             <span>Orders</span>
           </a>
 
           <a data-route="coffee" href="/coffee" on-tap="onDataRouteClick">
             <iron-icon icon="info"></iron-icon>
-            <span>Coffee</span>
+            <span>~Coffee~</span>
           </a>
 
           <a data-route="other" href="/other" on-tap="onDataRouteClick">

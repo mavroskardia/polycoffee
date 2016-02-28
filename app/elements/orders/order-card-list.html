@@ -1,19 +1,31 @@
 <dom-module id="order-card-list">
+    <style include="shared-styles"></style>
     <style>
         .hidden { display: none; }
-        order-card { margin: 0.5rem; }
+        order-card { margin: 0.5rem; width: 30rem; height: 14rem; }
     </style>
     <template>
+        <paper-toast id="message"></paper-toast>
+        <sweetwater-scraper id="sws"
+            coffees="{{coffees}}"
+            prices="{{prices}}"
+            on-scrape-success="scrapeDone">
+        </sweetwater-scraper>
         <firebase-collection id="fb"
             location="https://swcoffee.firebaseio.com/orders"
             data="{{orders}}"
+            on-firebase-child-changed="orderChanged">
+        </firebase-collection>
+        <firebase-collection id="fbpeople"
+            location="https://swcoffee.firebaseio.com/people"
+            data="{{people}}"
             on-firebase-child-changed="orderChanged">
         </firebase-collection>
         <div class="horizontal layout wrap">
             <template is="dom-repeat" items="{{orders}}">
                 <order-card order="{{item}}"></order-card>
             </template>
-            <paper-button raised class="self-center" on-tap="add">New Order</paper-button>
+            <paper-button id="addbtn" raised class="self-center" on-tap="add">New Order</paper-button>
         </div>
     </template>
 </dom-module>
@@ -30,7 +42,7 @@
             'order-selected': 'orderSelected'
         },
         orderSelected: function (e, order) {
-            [].forEach.call(this.querySelectorAll('order-card'), e => e.selected = false);
+            [].forEach.call(this.querySelectorAll('order-card'), elt => elt.selected = false);
             order.selected = true;
             this.selectedOrder = order.order;
         },
@@ -48,11 +60,30 @@
             this.selectedOrder = newSelected;
         },
         add: function () {
-            this.$.fb.add({
+            this.$.addbtn.disabled = true;
+            this.$.message.text = "Getting coffee inventory from Sweetwater...";
+            this.$.message.open();
+            this.$.sws.scrape();
+        },
+        scrapeDone: function () {
+            var order = {
                 date: new Date().getTime(),
                 status: 'open',
+                inventory: this.coffees,
+                prices: this.prices,
+                people: this.people,
                 items: []
-            });
+            };
+
+            this.$.fb.add(order);
+
+            this.$.message.text = "Created order for " + new Date(order.date).toLocaleDateString();
+            this.$.message.open();
+
+            this.$.addbtn.text = "New Order";
+            this.$.addbtn.disabled = false;
+
+            this.orderSelected(null, {order: order});
         }
     });
 </script>

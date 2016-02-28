@@ -1,0 +1,43 @@
+<dom-module id="order-item-list">
+    <style include="shared-styles"></style>
+    <style>
+        .lineitems { list-style: none; }
+        .lineitems li { border-bottom: solid 1px #ccc; }
+        table {
+            width: 100%;
+            text-align: center;
+            border-collapse: collapse;
+        }
+        table th {
+            font-weight: bold;
+            min-width: 5rem;
+        }
+        table tbody td {
+            border-bottom: solid 1px var(--light-divider-color);
+        }
+
+        paper-card { margin-bottom: 0.5rem; }
+    </style>
+    <template>
+
+
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'order-item-list',
+        properties: {
+            order: {
+                type: Object,
+                notify: true
+            }
+        },
+        removeItem: function (e, item) {
+            var idx = this.order.items.indexOf(item);
+            if (idx > -1) {
+                this.splice('order.items', idx, 1);
+                this.fire('order-updated');
+            }
+        }
+    });
+</script>

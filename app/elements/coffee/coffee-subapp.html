@@ -1,84 +1,68 @@
 <dom-module id="coffee-subapp">
-    <style>
-        * { font-weight: 200; }
-        strong * { font-weight: 500; }
-        li {
-            list-style: none;
-            display: inline-block;
-            margin: 0.5rem;
-        }
-        .coffee {
-            position: relative;
-            padding: 0.5rem;
-            width: 12rem;
-            text-align: center;
-        }
-        .coffee strong, .coffee em {
-            display: block;
-        }
-        .price {
-            padding: 0.5rem;
-        }
-    </style>
+    <style include="shared-styles"></style>
     <template>
         <paper-toast id="message"></paper-toast>
+        <sweetwater-scraper id="sws"
+            coffees="{{coffees}}"
+            prices="{{prices}}"
+            on-scrape-success="reenablebtn">
+        </sweetwater-scraper>
 
         <h2>Coffee</h2>
 
-        <firebase-collection id="fb"
-            location="https://swcoffee.firebaseio.com/inventory"
-            data="{{coffees}}"
-            order-by-child="type"
-            equal-to="coffee">
-        </firebase-collection>
+        <paper-tabs selected="{{selected}}">
+            <paper-tab>Coffee (<span>{{coffees.length}}</span>)</paper-tab>
+            <paper-tab>Prices (<span>{{prices.length}}</span>)</paper-tab>
+            <paper-tab>Other</paper-tab>
+        </paper-tabs>
 
-        <firebase-collection id="fbprices"
-            location="https://swcoffee.firebaseio.com/prices"
-            data="{{prices}}">
-        </firebase-collection>
+        <iron-pages selected="{{selected}}">
 
-        <iron-ajax id="ajax"
-             handle-as="json"
-             on-response="handleResponse">
-         </iron-ajax>
+            <div>
+                <ul class="horizontal layout start wrap">
+                    <template is="dom-repeat" items="{{coffees}}">
+                        <li>
+                            <paper-material elevation="1" class="coffee">
+                                <img src="{{item.img}}">
+                                <em>{{item.name}}</em>
+                                <currency-display value="{{item.price}}"></currency-display>
+                            </paper-material>
+                        </li>
+                    </template>
+                </ul>
+            </div>
 
-        <paper-button id="scrapebtn" raised on-tap="rescan">Scrape Sweetwater</paper-button>
+            <div>
+                <ul>
+                <template is="dom-repeat" items="{{prices}}" as="price">
+                    <li>
+                        <paper-material elevation="1" class="price">
+                            <div>
+                                <span>Retail:</span>
+                                <currency-display value="{{price.retail}}"></currency-display>
+                            </div>
+                            <div class="vertical layout">
+                                <paper-input label="1 lb." type="number" value="{{price.wholesale.0}}">
+                                    <div prefix>$</div>
+                                </paper-input>
+                                <paper-input label="2 lbs." type="number" value="{{price.wholesale.1}}">
+                                    <div prefix>$</div>
+                                </paper-input>
+                                <paper-input label="5 lbs." type="number" value="{{price.wholesale.2}}">
+                                    <div prefix>$</div>
+                                </paper-input>
+                            </div>
+                        </paper-material>
+                    </li>
+                </template>
+                </ul>
+            </div>
 
-        <ul class="horizontal layout start wrap">
-            <template is="dom-repeat" items="{{coffees}}">
-                <li>
-                    <paper-material elevation="1" class="coffee">
-                        <img src="{{item.img}}">
-                        <em>{{item.name}}</em>
-                        <currency-display value="{{item.price}}"></currency-display>
-                    </paper-material>
-                </li>
-            </template>
-        </ul>
+            <div>
+                <paper-button id="scrapebtn" raised on-tap="rescan">Scrape Sweetwater</paper-button>
+            </div>
 
-        <ul>
-        <template is="dom-repeat" items="{{prices}}" as="price">
-            <li>
-                <paper-material elevation="1" class="price">
-                    <div>
-                        <span>Retail:</span>
-                        <currency-display value="{{price.retail}}"></currency-display>
-                    </div>
-                    <div class="vertical layout">
-                        <paper-input label="1 lb." type="number" value="{{price.wholesale.0}}">
-                            <div prefix>$</div>
-                        </paper-input>
-                        <paper-input label="2 lbs." type="number" value="{{price.wholesale.1}}">
-                            <div prefix>$</div>
-                        </paper-input>
-                        <paper-input label="5 lbs." type="number" value="{{price.wholesale.2}}">
-                            <div prefix>$</div>
-                        </paper-input>
-                    </div>
-                </paper-material>
-            </li>
-        </template>
-        </ul>
+        </iron-pages>
     </template>
 </dom-module>
 <script>
@@ -88,61 +72,15 @@
 
     Polymer({
         is: 'coffee-subapp',
+        ready: function () {
+            this.selected = 0;
+        },
         rescan: function () {
-            this.$.scrapebtn.enabled = false;
-            var yql = encodeURIComponent('SELECT * FROM data.html.cssselect WHERE url="http://www.sweetwaterorganiccoffee.com/coffee/" AND css=".ProductList"');
-            var queryuri = `https://query.yahooapis.com/v1/public/yql?q=${yql}&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys`;
-            this.$.ajax.url = queryuri;//newquery;
-            this.$.ajax.generateRequest();
+            this.$.scrapebtn.disabled = true;
+            this.$.sws.scrape();
         },
-        handleResponse: function (data) {
-            var allprices = [];
-            var query = data.detail.response.query;
-
-            if (!query.results) {
-                this.$.message.innerText = 'No results for query';
-                this.$.scrapebtn.enabled = true;
-                return;
-            }
-
-            // TODO: cannot remove old coffees, need to de-activate them so old orders can still reference them!
-            this.deactivate('https://swcoffee.firebaseio.com/inventory');
-            this.deactivate('https://swcoffee.firebaseio.com/prices');
-
-            query.results.results.ul.li.forEach(function (li) {
-                var names = li.div.filter(d => d.class.indexOf('ProductDetails') !== -1).map(d => d.strong.a.content);
-                var images = li.div.filter(d => d.class.indexOf('QuickView') !== -1).map(d => d.a.img.src);
-                var prices = li.div
-                    .filter(d => d.class.indexOf('Price') !== -1)
-                    .map(d => typeof d.em === 'object'
-                        ? parseInt(parseFloat(d.em.span.content.replace('\$', '')) * 100)
-                        : parseInt(parseFloat(d.em.replace('\$', '')) * 100));
-
-                zip([names, prices, images]).forEach(d => {
-                    this.$.fb.add({
-                        name: d[0],
-                        price: d[1],
-                        img: d[2],
-                        type: 'coffee'
-                    });
-
-                    allprices.push({retail: d[1], wholesale: [8.75, 17.00, 41.25]});
-                });
-            }.bind(this));
-
-            var uniquePrices = {};
-            allprices.forEach(p => uniquePrices[p.retail] = p);
-            for (k in uniquePrices) {
-                this.$.fbprices.add(uniquePrices[k]);
-            }
-
-            this.$.scrapebtn.enabled = true;
-            this.$.message.text = 'Successfully scraped Sweetwater';
-            this.$.message.open();
-        },
-        deactivate: function (url) {
-            var ref = new Firebase(url);
-            ref.update({ active: false });
+        reenablebtn: function () {
+            this.$.scrapebtn.disabled = false;
         }
     });
 </script>

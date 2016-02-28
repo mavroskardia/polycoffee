@@ -1,8 +1,7 @@
 <dom-module id="order-card">
+    <style include="shared-styles"></style>
     <style>
-        :hover {
-            cursor: pointer;
-        }
+        :hover { cursor: pointer; }
         paper-card { background-color: #fff; }
         paper-card.selected {
             background-color: var(--primary-background-color);
@@ -11,29 +10,9 @@
         .divider { border-right: solid 1px #ccc; }
     </style>
     <template>
-        <firebase-collection id="personalitems"
-            location="https://swcoffee.firebaseio.com/personalitems/"
-            order-by-child="order"
-            equal-to="[[order.__firebaseKey__]]"
-            data="{{personalitems}}">
-        </firebase-collection>
-        <firebase-collection id="teamitems"
-            location="https://swcoffee.firebaseio.com/teamitems/"
-            order-by-child="order"
-            equal-to="[[order.__firebaseKey__]]"
-            data="{{teamitems}}">
-        </firebase-collection>
         <paper-card id="card" heading="{{toDate(order.date)}}" image="" elevation="2" on-tap="select">
             <div class="card-content vertical layout">
-                <div class="horizontal layout">
-                    <div class="divider spaced">
-                        <div><span>{{teamitems.length}}</span> team items</div>
-                        <div><span>{{personalitems.length}}</span> personal items</div>
-                    </div>
-                    <div class="spaced">
-                        <order-totals order="[[order]]"></order-totals>
-                    </div>
-                </div>
+                <order-totals order="[[order]]"></order-totals>
             </div>
             <div class="card-actions">
                 <template is="dom-if" if="{{isOpen(order)}}">

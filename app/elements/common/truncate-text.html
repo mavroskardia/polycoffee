@@ -1,0 +1,16 @@
+<dom-module id="truncate-text">
+    <style>
+        :host {
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+    <template><span title="{{text}}">{{text}}</span></template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'truncate-text'
+    });
+</script>

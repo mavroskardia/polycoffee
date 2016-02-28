@@ -22,15 +22,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   /* Application theme */
 
   :root {
+    --primary-color: #331c00; /*#006631;*/
     --dark-primary-color: #303F9F;
-    --default-primary-color: #29ae29;
-    --light-primary-color: #C5CAE9;
+    --default-primary-color: var(--primary-color); /*#29ae29;*/
+    --light-primary-color: #804600; /*#C5CAE9;*/
     --text-primary-color: #ffffff; /*text/icons*/
     --accent-color: #FF4081; /* #FF4081; */
-    --primary-background-color: #a4eaa4;
+    --primary-background-color: #ffffff;
     --primary-text-color: #212121;
+    --secondary-background-color: #f8dcb9;
     --secondary-text-color: #727272;
     --disabled-text-color: #bdbdbd;
+    --light-divider-color: #ccc;
     --divider-color: #B6B6B6;
 
     /* Components */
@@ -44,7 +47,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     --paper-menu-background-color: #fff;
     --menu-link-color: #111111;
 
-    --paper-tabs-selection-bar-color: var(--primary-background-color);
+    --paper-tabs-selection-bar-color: var(--primary-color);
     --paper-tab-ink: var(--primary-background-color);
   }
 
