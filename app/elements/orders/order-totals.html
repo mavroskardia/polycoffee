@@ -3,19 +3,10 @@
     <style>
         .data > * { margin: 0 0.25rem; }
         .spaceonleft { display: inline-block; margin: 0 0 0 0.5rem; }
+        .totals { padding-left: 1rem; border-left: solid 1px var(--divider-color); }
     </style>
     <template>
-        <div class="horizontal layout wrap data">
-            <div class="vertical layout">
-                <div class="horizontal layout">
-                    <span class="flex">Team Items: </span>
-                    <strong class="spaceonleft">{{numTeamItems}}</strong>
-                </div>
-                <div class="horizontal layout">
-                    <span class="flex">Personal Items: </span>
-                    <strong class="spaceonleft">{{numPersonalItems}}</strong>
-                </div>
-            </div>
+        <div class="horizontal layout data">
             <div class="vertical layout">
                 <div class="horizontal layout">
                     <span class="flex">Total weight: </span>
@@ -27,7 +18,7 @@
                     <currency-display class="spaceonleft" value="{{teamShare}}"></currency-display>
                 </div>
             </div>
-            <div class="vertical layout flex">
+            <div class="vertical layout flex totals">
                 <div class="horizontal layout">
                     <span class="flex">Team: </span>
                     <currency-display class="spaceonleft" value="{{teamTotal}}"></currency-display>
