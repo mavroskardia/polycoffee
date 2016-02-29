@@ -1,5 +1,8 @@
 <dom-module id="team-view">
     <style include="shared-styles"></style>
+    <style>
+        paper-card { margin: 0.25rem; }
+    </style>
     <template>
         <firebase-collection id="fbpeople"
             location="https://swcoffee.firebaseio.com/people/"
@@ -7,19 +10,19 @@
             equal-to="{{team.__firebaseKey__}}"
             data="{{people}}">
         </firebase-collection>
-        <h2>
-            <paper-input id="name" label="Team Name" value="{{team.name}}" on-change="change"></paper-input>
-        </h2>
-        <div class="horizontal layout wrap">
-            <div class="flex">
-                <h4>Add to Team</h4>
-                <paper-material elevation="1">
+        <div class="horizontal layout start wrap">
+            <paper-card heading="Team Name">
+                <div class="card-contents">
+                    <paper-input id="name" label="Team Name" value="{{team.name}}" on-change="change"></paper-input>
+                </div>
+            </paper-card>
+            <paper-card class="flex" heading="Add to Team">
+                <div class="card-contents">
                     <paper-input label="Name" placeholder="Name of person to add" on-change="addPerson"></paper-input>
-                </paper-material>
-            </div>
-            <div class="flex-2">
-                <h4>People on Team</h4>
-                <paper-material elevation="1">
+                </div>
+            </paper-card>
+            <paper-card class="flex-2" heading="People on Team">
+                <div class="card-contents">
                     <ul>
                         <template is="dom-repeat" items="{{people}}">
                             <li class="horizontal layout center">
@@ -28,8 +31,8 @@
                             </li>
                         </template>
                     </ul>
-                </paper-material>
-            </div>
+                </div>
+            </paper-card>
         </div>
     </template>
 </dom-module>
