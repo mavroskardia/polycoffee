@@ -26,7 +26,7 @@
                             </div>
                             <truncate-text class="self-center flex" text="{{item.name}}"></truncate-text>
                             <truncate-text class="self-center flex-2" text="{{item.description}}"></truncate-text>
-                            <currency-display class="self-center end" value="{{item.price}}"></currency-display>
+                            <currency-display class="self-center end" value="{{getItemCost(item)}}"></currency-display>
                         </template>
                         <paper-icon-button hidden$="{{!isOpen}}" icon="clear" class="self-center" on-tap="removeItem"></paper-icon-button>
                     </div>
@@ -52,6 +52,7 @@
                     .map(p => p.wholesale[item.size == 1 ? 0 : item.size == 2 ? 1 : 2])
                     .reduce((p,c)=> p + c, 0.0);
         },
+        getItemCost: i => parseFloat(i.price) * parseInt(i.quantity),
         getTotalCost: function (item) { return this.bagCost(item) * item.quantity * 100 },
         removeItem: function (e) {
             this.fire('remove-item', e.model.item);

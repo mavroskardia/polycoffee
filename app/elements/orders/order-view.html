@@ -40,11 +40,14 @@
 
         <iron-pages selected="{{selected}}">
             <section class="tiles layout horizontal wrap start">
-                <div class="layout vertical" hidden$="{{!isOpen}}">
+                <div class="layout vertical">
                     <order-add-item order="{{order}}"
+                        hidden$="{{!isOpen}}"
                         on-add-coffee="addItemToOrder"
                         on-add-other="addItemToOrder">
                     </order-add-item>
+                    <order-closed-summary hidden$="{{!isClosed}}" order="{{order}}"></order-closed-summary>
+                    <order-payments hidden$="{{!isPaid}}" order="{{order}}"></order-payments>
                 </div>
                 <div class="layout vertical">
                     <order-teamitems order="{{order}}" on-remove-item="removeItem"></order-teamitems>
@@ -54,12 +57,6 @@
                             <order-totals order="{{order}}"></order-totals>
                         </div>
                     </paper-card>
-                </div>
-                <div hidden$="{{!isClosed}}">
-                    <order-closed-summary order="{{order}}"></order-closed-summary>
-                </div>
-                <div hidden$="{{!isPaid}}">
-                    <order-payments order="{{order}}"></order-payments>
                 </div>
             </section>
             <section>
@@ -144,6 +141,7 @@
             this.fb.update({'status': 'closed', 'closed_date': new Date().getTime() });
         },
         bagCost: function (item) {
+            if (!item.isCoffee) return 0;
             return this.order.prices
                     .filter(p => p.retail == item.coffee.price)
                     .map(p => p.wholesale[item.size == 1 ? 0 : item.size == 2 ? 1 : 2])
@@ -153,29 +151,30 @@
             var teamTotal = order.items
                                 .filter(i => !i.personal)
                                 .map(i => i.quantity * this.bagCost(i) * 100)
+                                .concat(order.items
+                                    .filter(i => !i.isCoffee)
+                                    .map(i => parseFloat(i.price) * parseInt(i.quantity)))
                                 .reduce((a,b) => a + b, 0.0);
 
             return teamTotal / order.people.filter(p => p.team == order.team).length;
         },
         getOwed: function (order, person) {
             var total = order.items
-                            .filter(i => i.personal && i.person.__firebaseKey__ === person.__firebaseKey__)
+                            .filter(i => i.isCoffee && i.personal && i.person.__firebaseKey__ === person.__firebaseKey__)
                             .map(i => i.quantity * this.bagCost(i) * 100)
                             .reduce((a,b) => a + b, 0.0);
+
             total += person.team === order.team ? this.getTeamShare(order) : 0;
             return total;
         },
         payOrder: function () {
-            // finally time to generate payments
-            var payments = this.order.people.map(function (person) {
-                return {
-                    person: person,
-                    owed: this.getOwed(this.order, person),
+            var payments = this.order.people
+                .map(p => ({
+                    person: p,
+                    owed: this.getOwed(this.order, p),
                     paid: 0.0
-                };
-            }.bind(this));
-
-            payments = payments.filter(p => p.owed > 0);
+                }))
+                .filter(p => p.owed > 0);
 
             this.fb.update({
                 'status': 'paid',
