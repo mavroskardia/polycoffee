@@ -78,7 +78,7 @@
 
             var teamitems = order.items.filter(i => i.isCoffee && !i.personal);
 
-            this.numTeamItems = teamitems.length;
+            this.numTeamItems = order.items.filter(i => !i.personal).length;
 
             this.totalWeight = order.items
                                     .filter(i => i.isCoffee)
