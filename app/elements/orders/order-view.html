@@ -1,17 +1,16 @@
 <dom-module id="order-view">
     <style include="shared-styles"></style>
     <style>
-        :host {
-            position: relative;
-        }
+        :host { position: relative; }
 
-        order-add-coffee,
-        order-add-other,
+        order-add-item,
         order-teamitems,
         order-personalitems,
         order-prices,
+        order-closed-summary,
+        order-payments,
         paper-card
-        { margin: 0 0.5rem 0.25rem; }
+        { margin: 0.5rem; }
 
         paper-icon-button {
             position: absolute;
@@ -19,16 +18,14 @@
             left: -50px;
         }
 
-        paper-tabs {
-            margin-bottom: 1rem;
-        }
+        paper-tabs { margin-bottom: 1rem; }
     </style>
     <template>
         <paper-icon-button icon="arrow-back" on-tap="closeView"></paper-icon-button>
         <header class="horizontal layout">
             <h2 class="flex">Order for <span>{{toDate(order.date)}}</span></h2>
             <div class="end self-center">
-                <team-dropdown order="{{order}}" disabled="{{!isOpen}}"></team-dropdown>
+                <!-- <team-dropdown order="{{order}}" disabled="{{!isOpen}}"></team-dropdown> -->
                 <order-action order="[[order]]" class="self-center"
                     on-order-closed="closeOrder"
                     on-order-paid="payOrder">
@@ -42,13 +39,13 @@
         </paper-tabs>
 
         <iron-pages selected="{{selected}}">
-            <div class="tiles layout horizontal wrap start">
-                <order-add-item
-                    coffees="{{order.inventory}}"
-                    prices="{{order.prices}}"
-                    on-add-coffee="addItemToOrder"
-                    on-add-other="addItemToOrder">
-                </order-add-item>
+            <section class="tiles layout horizontal wrap start">
+                <div class="layout vertical" hidden$="{{!isOpen}}">
+                    <order-add-item order="{{order}}"
+                        on-add-coffee="addItemToOrder"
+                        on-add-other="addItemToOrder">
+                    </order-add-item>
+                </div>
                 <div class="layout vertical">
                     <order-teamitems order="{{order}}" on-remove-item="removeItem"></order-teamitems>
                     <order-personalitems order="{{order}}" on-remove-item="removeItem"></order-personalitems>
@@ -58,11 +55,17 @@
                         </div>
                     </paper-card>
                 </div>
-            </div>
+                <div hidden$="{{!isClosed}}">
+                    <order-closed-summary order="{{order}}"></order-closed-summary>
+                </div>
+                <div hidden$="{{!isPaid}}">
+                    <order-payments order="{{order}}"></order-payments>
+                </div>
+            </section>
             <section>
+                <order-coffee-list order="{{order}}"></order-coffee-list>
                 <order-prices order="{{order}}" on-price-update="updateOrder"></order-prices>
             </section>
-            <section></section>
         </iron-pages>
     </template>
 </dom-module>
@@ -76,11 +79,27 @@
                 notify: true,
                 observer: '_orderChanged'
             },
+            isOpen: {
+                type: Boolean,
+                computed: 'isOrderOpen(order)'
+            },
+            isClosed: {
+                type: Boolean,
+                computed: 'isOrderClosed(order)'
+            },
+            isPaid: {
+                type: Boolean,
+                computed: 'isOrderPaid(order)'
+            },
             selected: {
                 type: Number,
                 value: () => 0
             }
         },
+        orderOpen: function (order) { return order.status == 'open' },
+        isOrderOpen: o => o.status == 'open',
+        isOrderClosed: o => o.status == 'closed',
+        isOrderPaid: o => o.status == 'paid',
         removeItem: function (e, item) {
             var idx = this.order.items.indexOf(item);
             if (idx > -1) {
@@ -95,17 +114,74 @@
             if (!this.order) return;
             this.fb = new Firebase('https://swcoffee.firebaseio.com/orders/' + this.order.__firebaseKey__);
         },
+        combine: function (order, lineitem) {
+            if (!lineitem.isCoffee) return;
+            var combined = false;
+            order.items.filter(i=>i.isCoffee).forEach(i => {
+                if (i.coffee.name === lineitem.coffee.name
+                    && i.size === lineitem.size
+                    && i.personal === lineitem.personal
+                    && (!i.personal || i.person.__firebaseKey__ === lineitem.person.__firebaseKey__)) {
+                    var iquant = parseInt(i.quantity);
+                    var lquant = parseInt(lineitem.quantity);
+                    i.quantity = iquant + lquant;
+                    combined = true;
+                    return false;
+                }
+            });
+
+            return combined;
+        },
         addItemToOrder: function (e, lineitem) {
             if (!this.order.items) this.set('order.items', []);
-            this.push('order.items', lineitem);
+            if (!this.combine(this.order, lineitem)) {
+               this.push('order.items', lineitem);
+            }
             this.updateOrder();
         },
         toDate: t => new Date(t).toLocaleDateString(),
         closeOrder: function () {
-            this.fb.update({'status': 'closed'});
+            this.fb.update({'status': 'closed', 'closed_date': new Date().getTime() });
+        },
+        bagCost: function (item) {
+            return this.order.prices
+                    .filter(p => p.retail == item.coffee.price)
+                    .map(p => p.wholesale[item.size == 1 ? 0 : item.size == 2 ? 1 : 2])
+                    .reduce((p,c)=> p + c, 0.0);
+        },
+        getTeamShare: function (order) {
+            var teamTotal = order.items
+                                .filter(i => !i.personal)
+                                .map(i => i.quantity * this.bagCost(i) * 100)
+                                .reduce((a,b) => a + b, 0.0);
+
+            return teamTotal / order.people.filter(p => p.team == order.team).length;
+        },
+        getOwed: function (order, person) {
+            var total = order.items
+                            .filter(i => i.personal && i.person.__firebaseKey__ === person.__firebaseKey__)
+                            .map(i => i.quantity * this.bagCost(i) * 100)
+                            .reduce((a,b) => a + b, 0.0);
+            total += person.team === order.team ? this.getTeamShare(order) : 0;
+            return total;
         },
         payOrder: function () {
-            this.fb.update({'status': 'paid'});
+            // finally time to generate payments
+            var payments = this.order.people.map(function (person) {
+                return {
+                    person: person,
+                    owed: this.getOwed(this.order, person),
+                    paid: 0.0
+                };
+            }.bind(this));
+
+            payments = payments.filter(p => p.owed > 0);
+
+            this.fb.update({
+                'status': 'paid',
+                'paid_date': new Date().getTime(),
+                'payments': payments
+            });
         },
         closeView: function () {
             this.fire('view-closed');

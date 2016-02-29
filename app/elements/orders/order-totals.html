@@ -2,42 +2,43 @@
     <style include="shared-styles"></style>
     <style>
         .data > * { margin: 0 0.25rem; }
+        .spaceonleft { display: inline-block; margin: 0 0 0 0.5rem; }
     </style>
     <template>
-        <div class="horizontal layout data">
+        <div class="horizontal layout wrap data">
             <div class="vertical layout">
                 <div class="horizontal layout">
                     <span class="flex">Team Items: </span>
-                    <strong>{{numTeamItems}}</strong>
+                    <strong class="spaceonleft">{{numTeamItems}}</strong>
                 </div>
                 <div class="horizontal layout">
                     <span class="flex">Personal Items: </span>
-                    <strong>{{numPersonalItems}}</strong>
+                    <strong class="spaceonleft">{{numPersonalItems}}</strong>
                 </div>
             </div>
             <div class="vertical layout">
                 <div class="horizontal layout">
                     <span class="flex">Total weight: </span>
-                    <strong>{{totalWeight}}</strong>
+                    <strong class="spaceonleft">{{totalWeight}}</strong>
                     <span>#</span>
                 </div>
                 <div class="horizontal layout">
                     <span class="flex">Team member share: </span>
-                    <currency-display value="{{teamShare}}"></currency-display>
+                    <currency-display class="spaceonleft" value="{{teamShare}}"></currency-display>
                 </div>
             </div>
             <div class="vertical layout flex">
                 <div class="horizontal layout">
                     <span class="flex">Team: </span>
-                    <currency-display value="{{teamTotal}}"></currency-display>
+                    <currency-display class="spaceonleft" value="{{teamTotal}}"></currency-display>
                 </div>
                 <div class="horizontal layout">
                     <span class="flex">Personal: </span>
-                    <currency-display value="{{personalTotal}}"></currency-display>
+                    <currency-display class="spaceonleft" value="{{personalTotal}}"></currency-display>
                 </div>
                 <div class="horizontal layout">
                     <span class="flex">Grand: </span>
-                    <currency-display value="{{grandTotal(teamTotal, personalTotal)}}"></currency-display>
+                    <currency-display class="spaceonleft" value="{{grandTotal(teamTotal, personalTotal)}}"></currency-display>
                 </div>
             </div>
         </div>
@@ -75,16 +76,20 @@
         calculateTotals: function (order) {
             if (!order.items) return;
 
-            var teamitems = order.items.filter(i => !i.personal);
+            var teamitems = order.items.filter(i => i.isCoffee && !i.personal);
 
             this.numTeamItems = teamitems.length;
 
             this.totalWeight = order.items
+                                    .filter(i => i.isCoffee)
                                     .map(i => i.size * i.quantity)
                                     .reduce((a,b) => a + b, 0.0);
 
             this.teamTotal = teamitems
                                     .map(i => i.quantity * this.bagCost(i) * 100)
+                                    .concat(order.items
+                                        .filter(i => !i.isCoffee)
+                                        .map(i => i.price * i.quantity))
                                     .reduce((a,b) => a + b, 0.0);
 
             this.teamShare = this.teamTotal / order.people.filter(p => p.team == order.team).length;

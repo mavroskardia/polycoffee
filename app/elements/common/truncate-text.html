@@ -7,10 +7,21 @@
             white-space: nowrap;
         }
     </style>
-    <template><span title="{{text}}">{{text}}</span></template>
+    <template><span title="{{text}}">{{_text}}</span></template>
 </dom-module>
 <script>
     Polymer({
-        is: 'truncate-text'
+        is: 'truncate-text',
+        properties: {
+            text: String,
+            strip: Boolean,
+            _text: {
+                type: String,
+                computed: 'stripRedundant(text)'
+            }
+        },
+        stripRedundant: function (text) {
+            return this.strip ? this.text.replace('Fair Trade Organic Coffee', '') : this.text;
+        }
     });
 </script>

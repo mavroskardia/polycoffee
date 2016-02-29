@@ -8,7 +8,7 @@
         }
     </style>
     <template>
-        <paper-card class="white" heading="Add Coffee" image="/images/coffeecup2rs.jpg" elevation="2">
+        <paper-card class="white" heading="Add Coffee" image="/images/coffeecup2rs.jpg" elevation="1">
             <div class="card-contents vertical layout">
                 <paper-tabs selected="{{selected}}">
                     <paper-tab>Coffee</paper-tab>
@@ -16,7 +16,7 @@
                 </paper-tabs>
                 <iron-pages selected="{{selected}}">
                     <section class="vertical layout coffee-form">
-                        <inventory-dropdown on-iron-select="onAddCoffee" item="{{coffee}}" inventory="[[coffees]]"></inventory-dropdown>
+                        <inventory-dropdown on-iron-select="onAddCoffee" item="{{coffee}}" inventory="[[order.inventory]]"></inventory-dropdown>
                         <coffee-bag-size size="{{bagsize}}"></coffee-bag-size>
                         <coffee-quantity quantity="{{quantity}}"></coffee-quantity>
                         <paper-checkbox id="personal" checked="{{ispersonal}}">Personal Order</paper-checkbox>
@@ -40,8 +40,7 @@
     Polymer({
         is: 'order-add-item',
         properties: {
-            prices: Array,
-            coffees: Array,
+            order: Object,
             selected: {
                 type: Number,
                 value: () => 0

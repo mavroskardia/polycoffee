@@ -2,10 +2,10 @@
     <style include="shared-styles"></style>
     <style>
         .hidden { display: none; }
-        order-card { margin: 0.5rem; width: 30rem; height: 14rem; }
+        order-card { margin: 0.5rem; }
     </style>
     <template>
-        <paper-toast id="message"></paper-toast>
+        <paper-toast duration="0" id="message"></paper-toast>
         <sweetwater-scraper id="sws"
             coffees="{{coffees}}"
             prices="{{prices}}"
@@ -14,6 +14,7 @@
         <firebase-collection id="fb"
             location="https://swcoffee.firebaseio.com/orders"
             data="{{orders}}"
+            order-by-child="date"
             on-firebase-child-changed="orderChanged">
         </firebase-collection>
         <firebase-collection id="fbpeople"
@@ -21,8 +22,12 @@
             data="{{people}}"
             on-firebase-child-changed="orderChanged">
         </firebase-collection>
+        <firebase-collection id="fbteams"
+            location="https://swcoffee.firebaseio.com/teams"
+            data="{{teams}}">
+        </firebase-collection>
         <div class="horizontal layout wrap">
-            <template is="dom-repeat" items="{{orders}}">
+            <template is="dom-repeat" items="{{orders}}" sort="reverse">
                 <order-card order="{{item}}"></order-card>
             </template>
             <paper-button id="addbtn" raised class="self-center" on-tap="add">New Order</paper-button>
@@ -41,10 +46,13 @@
         listeners: {
             'order-selected': 'orderSelected'
         },
+        reverse: function (a, b) {
+            return b.date - a.date;
+        },
         orderSelected: function (e, order) {
             [].forEach.call(this.querySelectorAll('order-card'), elt => elt.selected = false);
             order.selected = true;
-            this.selectedOrder = order.order;
+            this.set('selectedOrder', order.order);
         },
         orderChanged: function (e, ref) {
             var newSelected = null,
@@ -66,12 +74,17 @@
             this.$.sws.scrape();
         },
         scrapeDone: function () {
+            this.$.message.close();
+
+            var team = this.teams.length ? this.teams[0].__firebaseKey__ : null;
+
             var order = {
                 date: new Date().getTime(),
                 status: 'open',
                 inventory: this.coffees,
                 prices: this.prices,
                 people: this.people,
+                team: team,
                 items: []
             };
 
@@ -80,10 +93,8 @@
             this.$.message.text = "Created order for " + new Date(order.date).toLocaleDateString();
             this.$.message.open();
 
-            this.$.addbtn.text = "New Order";
             this.$.addbtn.disabled = false;
-
-            this.orderSelected(null, {order: order});
+            this.orderSelected(null, { order: order });
         }
     });
 </script>

@@ -65,32 +65,17 @@
         <!-- Drawer Content -->
         <paper-menu class="list" attr-for-selected="data-route" selected="[[route]]">
           <a data-route="orders" href="/orders" on-tap="onDataRouteClick">
-            <iron-icon icon="home"></iron-icon>
+            <iron-icon icon="places:free-breakfast"></iron-icon>
             <span>Orders</span>
           </a>
 
-          <a data-route="coffee" href="/coffee" on-tap="onDataRouteClick">
-            <iron-icon icon="info"></iron-icon>
-            <span>~Coffee~</span>
-          </a>
-
-          <a data-route="other" href="/other" on-tap="onDataRouteClick">
-            <iron-icon icon="info"></iron-icon>
-            <span>Other</span>
-          </a>
-
           <a data-route="teams" href="/teams" on-tap="onDataRouteClick">
-            <iron-icon icon="mail"></iron-icon>
+            <iron-icon icon="social:group"></iron-icon>
             <span>Teams</span>
           </a>
 
-          <a data-route="payments" href="/payments" on-tap="onDataRouteClick">
-            <iron-icon icon="mail"></iron-icon>
-            <span>Payments</span>
-          </a>
-
           <a data-route="feedback" href="/feedback" on-tap="onDataRouteClick">
-            <iron-icon icon="mail"></iron-icon>
+            <iron-icon icon="communication:chat"></iron-icon>
             <span>Feedback</span>
           </a>
 
@@ -108,20 +93,8 @@
               <ordering-subapp></ordering-subapp>
             </section>
 
-            <section data-route="coffee">
-              <coffee-subapp></coffee-subapp>
-            </section>
-
-            <section data-route="other">
-              <other-subapp></other-subapp>
-            </section>
-
             <section data-route="teams">
               <team-subapp></team-subapp>
-            </section>
-
-            <section data-route="payments">
-              <payments-subapp></payments-subapp>
             </section>
 
             <section data-route="feedback">

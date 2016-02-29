@@ -2,6 +2,7 @@
     <style include="shared-styles"></style>
     <style>
         paper-card { width: 30rem; }
+        paper-icon-button { width: 30px; }
         .items > * { padding: 0.25rem; }
         .name { width: 4rem; }
     </style>
@@ -10,17 +11,16 @@
             <div class="card-contents">
                 <template is="dom-repeat" items="{{getPersonalItems(order)}}">
                     <div class="horizontal layout items center">
-                        <truncate-text class="name self-center" text="{{item.person.name}}"></truncate-text>
+                        <span class="name self-center">{{item.person.name}}</span>
                         <div class="self-center">
                             {{item.quantity}}<span>&times;</span>
                         </div>
                         <div class="self-center">
                             {{item.size}}<span>#</span>
                         </div>
-                        <truncate-text class="self-center" text="{{item.coffee.name}}"></truncate-text>
-                        <currency-display class="self-center" value="{{getTotalCost(item)}}"></currency-display>
-                        <small>(<currency-display value="{{item.coffee.price}}"></currency-display>)</small>
-                        <paper-icon-button class="self-center" icon="clear" on-tap="removeItem"></paper-icon-button>
+                        <truncate-text class="self-center flex" text="{{item.coffee.name}}"></truncate-text>
+                        <currency-display class="self-center end" value="{{getTotalCost(item)}}"></currency-display>
+                        <paper-icon-button class="self-center end" hidden$="{{!isOpen}}" icon="clear" on-tap="removeItem"></paper-icon-button>
                     </div>
                 </template>
             </div>
@@ -31,8 +31,13 @@
     Polymer({
         is: 'order-personalitems',
         properties: {
-            order: Object
+            order: Object,
+            isOpen: {
+                type: Boolean,
+                computed: 'orderOpen(order)'
+            }
         },
+        orderOpen: o => o.status == 'open',
         removeItem: function (e) {
             this.fire('remove-item', e.model.item);
         },

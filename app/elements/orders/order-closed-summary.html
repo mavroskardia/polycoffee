@@ -1,0 +1,51 @@
+<dom-module id="order-closed-summary">
+    <style include="shared-styles"></style>
+    <style>
+        ul { list-style: none; margin: 0; padding: 0; }
+        li > * { display: inline-block; margin: 0 0.25rem; }
+    </style>
+    <template>
+        <paper-card heading="Order Closed">
+            <div class="card-contents">
+                <ul>
+                <template is="dom-repeat" items="{{combinedItems(order)}}">
+                    <li class="horizontal layout center">
+                        <span>{{item.quantity}}<span>&times;</span></span>
+                        <span>{{item.size}}<span>#</span></span>
+                        <truncate-text strip="true" class="self-center" text="{{item.name}}"></truncate-text>
+                    </li>
+                </template>
+                </ul>
+            </div>
+        </paper-card>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'order-closed-summary',
+        properties: {
+            order: Object
+        },
+        combinedItems: function (order) {
+            if (!order.items) return [];
+            var bycoffee = {};
+            order.items.filter(i=>i.isCoffee).forEach(function (i) {
+                if (i.coffee.name in bycoffee) {
+                    bycoffee[i.coffee.name].quantity += parseInt(i.quantity);
+                } else {
+                    bycoffee[i.coffee.name] = {
+                        quantity: parseInt(i.quantity),
+                        size: parseInt(i.size),
+                        name: i.coffee.name
+                    };
+                }
+            });
+
+            var ret = [];
+
+            for (k in bycoffee) ret.push(bycoffee[k]);
+
+            return ret;
+        }
+    });
+</script>

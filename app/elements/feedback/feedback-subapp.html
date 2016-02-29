@@ -1,21 +1,42 @@
 <dom-module id="feedback-subapp">
     <style include="shared-styles"></style>
+    <style>
+        paper-card { margin: 0.5rem; }
+        small { margin-right: 0.5rem; }
+        p { margin: 0; }
+        .feedback {
+            min-width: 30rem;
+        }
+        .entry {
+            border-bottom: solid 1px #eee;
+            padding: 0.5rem;
+        }
+    </style>
     <template>
         <firebase-collection id="fb"
             location="https://swcoffee.firebaseio.com/feedback"
             data="{{feedbacks}}">
         </firebase-collection>
-        <header>
-            <h2>Feedback</h2>
-        </header>
-        <paper-material elevation="1" class="flex-2">
-            <paper-textarea id="message" label="Please indicate what can be improved"></paper-textarea>
-            <paper-button raised on-tap="submit">Submit Feedback</paper-button>
-        </paper-material>
-        <h3>Recent Feedback</h3>
-        <template is="dom-repeat" items="{{feedbacks}}">
-            <p class="entry"><small>{{formatDate(item.date)}}</small> <span>{{item.message}}</span></p>
-        </template>
+        <div class="vertical layout start wrap">
+            <paper-card heading="Feedback" class="feedback">
+                <div class="card-contents">
+                    <paper-textarea id="message" label="Please indicate what can be improved"></paper-textarea>
+                </div>
+                <div class="card-actions">
+                    <paper-button on-tap="submit">Submit Feedback</paper-button>
+                </div>
+            </paper-card>
+            <paper-card heading="Recent Feedback" class="flex">
+                <div class="card-contents">
+                    <template is="dom-repeat" items="{{feedbacks}}">
+                        <div class="horizontal layout start entry">
+                            <small>{{formatDate(item.date)}}</small>
+                            <p class="flex">{{item.message}}</p>
+                        </div>
+                    </template>
+                </div>
+            </paper-card>
+        </div>
         <paper-toast id="toast" text="Your feedback has been submitted. Thank you!"></paper-toast>
     </template>
 </dom-module>

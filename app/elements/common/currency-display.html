@@ -1,6 +1,10 @@
 <dom-module id="currency-display">
     <style include="shared-styles"></style>
-    <template><span>$</span><strong>{{asCurrency(value)}}</strong></template>
+    <style>
+        .red { color: #900; }
+        .green { color: #090; }
+    </style>
+    <template><span>$</span><strong class$="{{highlight}}">{{asCurrency(value)}}</strong></template>
 </dom-module>
 <script>
     Polymer({
@@ -10,7 +14,8 @@
             value: {
                 type: Number,
                 readonly: true
-            }
+            },
+            highlight: String
         }
     });
 </script>

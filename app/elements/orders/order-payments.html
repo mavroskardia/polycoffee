@@ -1,0 +1,39 @@
+<dom-module id="order-payments">
+    <style include="shared-styles"></style>
+    <style></style>
+    <template>
+        <paper-card heading="Payments">
+            <div class="card-contents">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Person</th>
+                            <th>Owed</th>
+                            <th>Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template is="dom-repeat" items="{{order.payments}}">
+                        <tr>
+                            <td>{{item.person.name}}</td>
+                            <td><currency-display value="{{item.owed}}"></currency-display></td>
+                            <td><currency-display highlight="{{getHighlight(item.owed, item.paid)}}" value="{{item.paid}}"></currency-display></td>
+                        </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </paper-card>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'order-payments',
+        properties: {
+            order: Object
+        },
+        getHighlight: function (owed, paid) {
+            return paid >= owed ? 'green' : 'red';
+        }
+    });
+</script>

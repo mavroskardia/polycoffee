@@ -19,7 +19,6 @@
                             </div>
                             <truncate-text class="self-center flex" text="{{item.coffee.name}}"></truncate-text>
                             <currency-display class="self-center end" value="{{getTotalCost(item)}}"></currency-display>
-                            <small>(<currency-display value="{{item.coffee.price}}"></currency-display>)</small>
                         </template>
                         <template is="dom-if" if="{{!item.isCoffee}}">
                             <div class="self-center" title="Quantity">
@@ -29,7 +28,7 @@
                             <truncate-text class="self-center flex-2" text="{{item.description}}"></truncate-text>
                             <currency-display class="self-center end" value="{{item.price}}"></currency-display>
                         </template>
-                        <paper-icon-button icon="clear" class="self-center" on-tap="removeItem"></paper-icon-button>
+                        <paper-icon-button hidden$="{{!isOpen}}" icon="clear" class="self-center" on-tap="removeItem"></paper-icon-button>
                     </div>
                 </template>
             </div>
@@ -40,8 +39,13 @@
     Polymer({
         is: 'order-teamitems',
         properties: {
-            order: Object
+            order: Object,
+            isOpen: {
+                type: Boolean,
+                computed: 'orderOpen(order)'
+            }
         },
+        orderOpen: o => o.status == 'open',
         bagCost: function (item) {
             return this.order.prices
                     .filter(p => p.retail == item.coffee.price)

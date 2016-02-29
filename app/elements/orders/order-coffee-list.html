@@ -1,0 +1,48 @@
+<dom-module id="order-coffee-list">
+    <style include="shared-styles"></style>
+    <style>
+        paper-material {
+            width: 20rem;
+            padding: 0;
+            margin: 0.25rem;
+            border-radius: 2px;
+            background-color: var(--primary-background-color);
+        }
+
+        iron-image {
+            width: 100%;
+            height: 200px;
+        }
+
+        .contents {
+            padding: 1rem;
+        }
+    </style>
+    <template>
+        <div class="horizontal layout wrap start">
+            <template is="dom-repeat" items="{{order.inventory}}">
+                <paper-material>
+                    <iron-image sizing="cover" src="{{item.img}}"></iron-image>
+                    <div class="vertical layout contents">
+                        <strong>{{item.name}}</strong>
+                        <currency-display value="{{item.price}}"></currency-display>
+                    </div>
+                </paper-material>
+                <!-- <paper-card class="white" image="{{item.img}}">
+                    <div class="card-contents vertical layout">
+                        <strong>{{item.name}}</strong>
+                        <currency-display value="{{item.price}}"></currency-display>
+                    </div>
+                </paper-card> -->
+            </template>
+        </div>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'order-coffee-list',
+        properties: {
+            order: Object
+        }
+    });
+</script>
