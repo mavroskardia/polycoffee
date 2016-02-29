@@ -7,6 +7,9 @@
     <template>
         <template is="dom-if" if="{{team}}">
             <firebase-collection
+                on-firebase-child-changed="touchLock"
+                on-firebase-child-added="touchLock"
+                on-firebase-child-removed="touchLock"
                 location="https://swcoffee.firebaseio.com/people/"
                 order-by-child="team"
                 equal-to="[[team.__firebaseKey__]]"
@@ -16,7 +19,7 @@
 
         <paper-card id="card" heading="{{team.name}}" image="" elevation="1" animated-shadow="false">
             <div class="card-content">
-                <span><span>{{people.length}}</span> people on this team</span>
+                <span>{{personStatement(people, updatelock)}}</span>
             </div>
             <paper-ripple></paper-ripple>
         </paper-card>
@@ -34,7 +37,17 @@
                 type: Boolean,
                 value: false,
                 observer: 'selectedChanged'
+            },
+            updatelock: {
+                type: Number,
+                value: () => 0
             }
+        },
+        personStatement: function (people, updatelock) {
+            return [people.length, people.length > 1 ? 'people' : 'person', 'on', this.team.name].join(' ');
+        },
+        touchLock: function () {
+            this.updatelock += 1; // because firebase does not notify polymer of collection changes
         },
         selectedChanged: function (newValue, oldValue) {
             if (oldValue === undefined) {

@@ -12,6 +12,14 @@
         paper-card
         { margin: 0.5rem; }
 
+        order-teamitems,
+        order-personalitems,
+        order-payments,
+        paper-card.totals
+        {
+            width: 32rem;
+        }
+
         paper-icon-button {
             position: absolute;
             top: 14px;
@@ -52,7 +60,7 @@
                 <div class="layout vertical">
                     <order-teamitems order="{{order}}" on-remove-item="removeItem"></order-teamitems>
                     <order-personalitems order="{{order}}" on-remove-item="removeItem"></order-personalitems>
-                    <paper-card heading="Order Totals">
+                    <paper-card class="totals" heading="Order Totals">
                         <div class="card-contents">
                             <order-totals order="{{order}}"></order-totals>
                         </div>

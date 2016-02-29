@@ -1,6 +1,12 @@
 <dom-module id="order-payments">
     <style include="shared-styles"></style>
-    <style></style>
+    <style>
+        paper-card { width: 100%; }
+        table { width: 100%; text-align: center; border-collapse: collapse; }
+        thead tr th { font-weight: 400; border-bottom: solid 1px var(--divider-color); }
+        th, td { padding: 0.25rem 1rem; }
+        .right { text-align: right; }
+    </style>
     <template>
         <paper-card heading="Payments">
             <div class="card-contents">
@@ -8,16 +14,16 @@
                     <thead>
                         <tr>
                             <th>Person</th>
-                            <th>Owed</th>
-                            <th>Paid</th>
+                            <th class="right">Owed</th>
+                            <th class="right">Paid</th>
                         </tr>
                     </thead>
                     <tbody>
                         <template is="dom-repeat" items="{{order.payments}}">
                         <tr>
                             <td>{{item.person.name}}</td>
-                            <td><currency-display value="{{item.owed}}"></currency-display></td>
-                            <td><currency-display highlight="{{getHighlight(item.owed, item.paid)}}" value="{{item.paid}}"></currency-display></td>
+                            <td class="right"><currency-display value="{{item.owed}}"></currency-display></td>
+                            <td class="right"><currency-display highlight="{{getHighlight(item.owed, item.paid)}}" value="{{item.paid}}"></currency-display></td>
                         </tr>
                         </template>
                     </tbody>
