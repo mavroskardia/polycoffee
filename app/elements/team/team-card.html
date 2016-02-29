@@ -44,6 +44,7 @@
             }
         },
         personStatement: function (people, updatelock) {
+            if (updatelock < 0) { return; }
             return [people.length, people.length > 1 ? 'people' : 'person', 'on', this.team.name].join(' ');
         },
         touchLock: function () {
