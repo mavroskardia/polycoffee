@@ -27,8 +27,8 @@
                         <em>All fields required</em>
                         <paper-input id="name" label="Name" on-change="checkCanAdd"></paper-input>
                         <paper-input id="description" label="Description" on-change="checkCanAdd"></paper-input>
-                        <paper-input id="price" type="number" min="0" label="Price" on-change="checkCanAdd"></paper-input>
-                        <paper-input id="quantity" value="1" min="0" type="number" label="Quantity" on-change="checkCanAdd"></paper-input>
+                        <paper-input id="price" type="number" min="0" label="Price" auto-validate="true" on-change="checkCanAdd"></paper-input>
+                        <paper-input id="quantity" value="1" min="0" type="number" auto-validate="true" label="Quantity" on-change="checkCanAdd"></paper-input>
                         <paper-button id="addother" disabled on-tap="addOther">Add</paper-button>
                     </section>
                 </iron-pages>
@@ -50,7 +50,12 @@
             this.$.addcoffee.disabled = false;
         },
         checkCanAdd: function () {
-            this.$.addother.disabled = !(this.$.name.value && this.$.description.value && this.$.price.value && this.$.quantity.value);
+            this.$.addother.disabled = !(this.$.name.value &&
+                                        this.$.description.value &&
+                                        this.$.price.value &&
+                                        this.$.quantity.value &&
+                                        this.$.price.validate() &&
+                                        this.$.quantity.validate());
         },
         addCoffee: function () {
             var lineitem = {

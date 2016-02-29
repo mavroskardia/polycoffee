@@ -74,7 +74,15 @@
             this.calculateTotals(newOrder);
         },
         calculateTotals: function (order) {
-            if (!order.items) { return; }
+            if (!order.items) {
+                this.teamTotal = 0;
+                this.totalWeight = 0;
+                this.teamShare = 0;
+                this.numTeamItems = 0;
+                this.numPersonalItems = 0;
+                this.personalTotal = 0;
+                return;
+            }
 
             var teamitems = order.items.filter(i => i.isCoffee && !i.personal);
 

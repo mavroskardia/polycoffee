@@ -4,16 +4,13 @@
         paper-dropdown-menu {
             display: block;
         }
-        paper-item-body {
+        paper-item {
             display: block;
             width: 100%;
             border-bottom: solid 1px #eee;
         }
-        paper-item-body em {
-            font-style: oblique;
-            text-align: right;
-            font-size: 0.8rem;
-            color: #888;
+        paper-item:hover {
+            background-color: rgba(0,0,0,0.1);
         }
     </style>
     <template>
@@ -21,11 +18,8 @@
             <paper-menu id="menu" class="dropdown-content"
                 on-iron-select="select">
                 <template is="dom-repeat" items="{{inventory}}">
-                    <paper-item>
-                        <paper-item-body class="horizontal layout">
-                            <span class="flex">{{item.name}}</span>
-                            <em><currency-display value="{{item.price}}"></currency-display></em>
-                        </paper-item-body>
+                    <paper-item class="horizontal layout center">
+                        <span class="flex">{{item.name}}</span>
                     </paper-item>
                 </template>
             </paper-menu>
