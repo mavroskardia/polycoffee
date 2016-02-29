@@ -56,7 +56,8 @@ var jshintTask = function (src) {
   return gulp.src(src)
     .pipe($.jshint.extract()) // Extract JS from .html files
     .pipe($.jshint({
-      esnext: true
+      esversion: 6,
+      eqeqeq: false
     }))
     .pipe($.jshint.reporter('jshint-stylish'))
     .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
@@ -124,7 +125,8 @@ gulp.task('jshint', function () {
     ])
     .pipe($.jshint.extract()) // Extract JS from .html files
     .pipe($.jshint({
-      esnext: true
+      esversion: 6,
+      eqeqeq: false
     }))
     .pipe($.jshint.reporter('jshint-stylish'))
     .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));

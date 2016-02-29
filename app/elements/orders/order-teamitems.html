@@ -53,7 +53,7 @@
                     .reduce((p,c)=> p + c, 0.0);
         },
         getItemCost: i => parseFloat(i.price) * parseInt(i.quantity),
-        getTotalCost: function (item) { return this.bagCost(item) * item.quantity * 100 },
+        getTotalCost: function (item) { return this.bagCost(item) * item.quantity * 100; },
         removeItem: function (e) {
             this.fire('remove-item', e.model.item);
         },

@@ -34,7 +34,7 @@
             }
         },
         teamrefMatch: function (team) {
-            return team.__firebaseKey__ == this.order.team;
+            return team.__firebaseKey__ === this.order.team;
         },
         select: function () {
             var fb = new Firebase('https://swcoffee.firebaseio.com/orders/' + this.order.__firebaseKey__);

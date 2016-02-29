@@ -44,7 +44,7 @@
             }
         },
         _selectedChanged: function (newValue, oldValue) {
-            if (oldValue === undefined) return;
+            if (oldValue === undefined) { return; }
 
             if (newValue) {
                 this.$.card.classList.add('selected');

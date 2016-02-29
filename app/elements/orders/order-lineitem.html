@@ -56,8 +56,9 @@
             this.playAnimation('exit', true);
         },
         _onAnimationFinish: function (e, isRemove) {
-            if (isRemove)
+            if (isRemove) {
                 this.fire('remove-item', this.item);
+            }
         }
     });
 </script>

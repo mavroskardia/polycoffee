@@ -37,12 +37,15 @@
             }
         },
         selectedChanged: function (newValue, oldValue) {
-            if (oldValue === undefined) return;
+            if (oldValue === undefined) {
+                return;
+            }
 
-            if (newValue)
+            if (newValue) {
                 this.$.card.classList.add('selected');
-            else
+            } else {
                 this.$.card.classList.remove('selected');
+            }
         }
     });
 </script>

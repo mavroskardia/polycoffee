@@ -11,7 +11,7 @@
     Polymer({
         is: 'ordering-subapp',
         toggle: function () {
-            this.$.pages.selected = this.$.pages.selected == 0 ? 1 : 0;
+            this.$.pages.selected = parseInt(this.$.pages.selected) === 0 ? 1 : 0;
         }
     });
 </script>

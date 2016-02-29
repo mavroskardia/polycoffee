@@ -39,7 +39,6 @@
         },
         handleResponse: function (data) {
             var allprices = [],
-                coffees = [],
                 query = data.detail.response.query;
 
             if (!query.results) {
@@ -53,9 +52,9 @@
                 var images = li.div.filter(d => d.class.indexOf('QuickView') !== -1).map(d => d.a.img.src);
                 var prices = li.div
                     .filter(d => d.class.indexOf('Price') !== -1)
-                    .map(d => typeof d.em === 'object'
-                        ? parseInt(parseFloat(d.em.span.content.replace('\$', '')) * 100)
-                        : parseInt(parseFloat(d.em.replace('\$', '')) * 100));
+                    .map(d => typeof d.em === 'object' ?
+                        parseInt(parseFloat(d.em.span.content.replace('\$', '')) * 100) :
+                        parseInt(parseFloat(d.em.replace('\$', '')) * 100));
 
                 zip([names, prices, images]).forEach(function (d) {
                     this.push('coffees', {

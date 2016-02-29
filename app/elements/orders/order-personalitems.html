@@ -42,12 +42,12 @@
             this.fire('remove-item', e.model.item);
         },
         bagCost: function (item) {
-            return this.order.prices
-                    .filter(p => p.retail == item.coffee.price)
-                    .map(p => p.wholesale[item.size == 1 ? 0 : item.size == 2 ? 1 : 2])
-                    .reduce((p,c)=> p + c, 0.0);
+            return this.order.prices.
+                    filter(p => p.retail == item.coffee.price).
+                    map(p => p.wholesale[item.size == 1 ? 0 : item.size == 2 ? 1 : 2]).
+                    reduce((p,c)=> p + c, 0.0);
         },
-        getTotalCost: function (item) { return this.bagCost(item) * item.quantity * 100 },
+        getTotalCost: function (item) { return this.bagCost(item) * item.quantity * 100; },
         getPersonalItems: order => [].filter.call(order.items || [], i => i.personal)
     });
 </script>

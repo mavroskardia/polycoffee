@@ -46,7 +46,7 @@
                 value: () => 0
             }
         },
-        onAddCoffee: function (e) {
+        onAddCoffee: function () {
             this.$.addcoffee.disabled = false;
         },
         checkCanAdd: function () {
@@ -64,7 +64,7 @@
 
             this.fire('add-coffee', lineitem);
         },
-        addOther: function (e) {
+        addOther: function () {
             var lineitem = {
                 isCoffee: false,
                 name: this.$.name.value,

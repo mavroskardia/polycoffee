@@ -70,11 +70,11 @@
             }
         },
         _orderChanged: function (newOrder) {
-            if (!newOrder) return;
+            if (!newOrder) { return; }
             this.calculateTotals(newOrder);
         },
         calculateTotals: function (order) {
-            if (!order.items) return;
+            if (!order.items) { return; }
 
             var teamitems = order.items.filter(i => i.isCoffee && !i.personal);
 
@@ -92,7 +92,7 @@
                                         .map(i => i.price * i.quantity))
                                     .reduce((a,b) => a + b, 0.0);
 
-            this.teamShare = this.teamTotal / order.people.filter(p => p.team == order.team).length;
+            this.teamShare = this.teamTotal / order.people.filter(p => p.team === order.team).length;
 
             var personalitems = order.items.filter(i => i.personal);
 
@@ -104,7 +104,7 @@
         },
         bagCost: function (item) {
             return this.order.prices
-                    .filter(p => p.retail == item.coffee.price)
+                    .filter(p => p.retail === item.coffee.price)
                     .map(p => p.wholesale[item.size == 1 ? 0 : item.size == 2 ? 1 : 2])
                     .reduce((p,c)=> p + c, 0.0);
         },

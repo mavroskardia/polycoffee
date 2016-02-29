@@ -69,7 +69,7 @@
         },
         add: function () {
             this.$.addbtn.disabled = true;
-            this.$.message.text = "Getting coffee inventory from Sweetwater...";
+            this.$.message.text = 'Getting coffee inventory from Sweetwater...';
             this.$.message.open();
             this.$.sws.scrape();
         },
@@ -90,7 +90,7 @@
 
             this.$.fb.add(order);
 
-            this.$.message.text = "Created order for " + new Date(order.date).toLocaleDateString();
+            this.$.message.text = 'Created order for ' + new Date(order.date).toLocaleDateString();
             this.$.message.open();
 
             this.$.addbtn.disabled = false;
