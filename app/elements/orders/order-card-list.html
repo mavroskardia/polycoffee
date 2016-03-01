@@ -79,6 +79,7 @@
             var team = this.teams.length ? this.teams[0].__firebaseKey__ : null;
 
             var order = {
+                name: new Date().toLocaleDateString(),
                 date: new Date().getTime(),
                 status: 'open',
                 inventory: this.coffees,

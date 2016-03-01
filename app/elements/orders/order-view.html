@@ -159,7 +159,8 @@
                     .reduce((p,c)=> p + c, 0.0);
         },
         getTeamShare: function (order) {
-            var teamTotal = teamitems
+            var teamTotal = order.items
+                                .filter(i => !i.personal)
                                 .map(i => i.quantity * this.bagCost(i) * 100)
                                 .concat(order.items
                                     .filter(i => !i.isCoffee)
