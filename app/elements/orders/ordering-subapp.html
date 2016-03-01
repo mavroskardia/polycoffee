@@ -12,7 +12,7 @@
     Polymer({
         is: 'ordering-subapp',
         properties: {
-            index: Number
+            name: String
         },
         toggle: function () {
             this.$.pages.selected = parseInt(this.$.pages.selected) === 0 ? 1 : 0;

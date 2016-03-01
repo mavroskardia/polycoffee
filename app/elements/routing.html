@@ -42,32 +42,45 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
 
     page('/', function() {
-      app.route = 'home';
+      console.log('page.js: /');
+      app.route = 'orders';
       setFocus(app.route);
     });
 
     page(app.baseUrl, function() {
-      app.route = 'home';
+      console.log('page.js: ' + app.baseUrl);
+      app.route = 'orders';
       setFocus(app.route);
     });
 
     page('/orders', function() {
-      app.route = 'home';
+      console.log('page.js: /orders');
+      app.route = 'orders';
       setFocus(app.route);
     });
 
-    page('/orders/:index', function(data) {
-      app.route = 'orders';
+    page('/orders/:name', function(data) {
+      debugger;
+      app.route = 'test';
       app.params = data.params;
       setFocus(app.route);
     });
 
     page('/people', function() {
+      console.log('page.js: /people');
       app.route = 'people';
       setFocus(app.route);
     });
 
+    page('/people/:name', function(data) {
+      debugger;
+      console.log('page.js: /people');
+      app.route = 'person';
+      setFocus(app.route);
+    });
+
     page('/feedback', function() {
+      console.log('page.js: /feedback');
       app.route = 'feedback';
       setFocus(app.route);
     });

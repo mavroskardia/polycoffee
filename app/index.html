@@ -74,7 +74,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <!-- Drawer Content -->
         <paper-menu attr-for-selected="data-route" selected="[[route]]">
-          <a data-route="orders" href="{{baseUrl}}">
+          <a data-route="orders" href="{{baseUrl}}orders">
             <iron-icon icon="places:free-breakfast"></iron-icon>
             <span>Orders</span>
           </a>
@@ -98,16 +98,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- Main Content -->
         <div class="content">
           <iron-pages attr-for-selected="data-route" selected="{{route}}">
-            <section data-route="home" tabindex="-1">
+            <section data-route="orders" tabindex="-1">
               <ordering-subapp index="{{params.index}}"></ordering-subapp>
             </section>
 
             <section data-route="people" tabindex="-1">
               <people-subapp></people-subapp>
+              <a href$="{{baseUrl}}people/Addy">Addy</a>
             </section>
 
             <section data-route="feedback" tabindex="-1">
               <feedback-subapp></feedback-subapp>
+            </section>
+
+            <section data-route="person">
+              <h1>Inside person</h1>
             </section>
           </iron-pages>
         </div>
