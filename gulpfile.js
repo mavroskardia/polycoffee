@@ -18,12 +18,12 @@ var $ = require('gulp-load-plugins')();
 var del = require('del');
 var runSequence = require('run-sequence');
 var browserSync = require('browser-sync');
+var superstatic = require('superstatic');
 var reload = browserSync.reload;
 var merge = require('merge-stream');
 var path = require('path');
 var fs = require('fs');
 var glob = require('glob-all');
-var historyApiFallback = require('connect-history-api-fallback');
 var packageJson = require('./package.json');
 var crypto = require('crypto');
 var ensureFiles = require('./tasks/ensure-files.js');
@@ -232,8 +232,10 @@ gulp.task('serve', ['styles'], function() {
     //       will present a certificate warning in the browser.
     // https: true,
     server: {
-      baseDir: ['.tmp', 'app'],
-      middleware: [historyApiFallback()]
+      baseDir: ['app'],
+      middleware: [superstatic({
+        config: { public: ['.tmp', 'app'] }
+      })]
     }
   });
 
@@ -262,7 +264,7 @@ gulp.task('serve:dist', ['default'], function() {
     //       will present a certificate warning in the browser.
     // https: true,
     server: dist(),
-    middleware: [historyApiFallback()]
+    middleware: [superstatic()]
   });
 });
 

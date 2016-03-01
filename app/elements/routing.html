@@ -42,45 +42,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
 
     page('/', function() {
-      console.log('page.js: /');
       app.route = 'orders';
       setFocus(app.route);
     });
 
     page(app.baseUrl, function() {
-      console.log('page.js: ' + app.baseUrl);
       app.route = 'orders';
       setFocus(app.route);
     });
 
     page('/orders', function() {
-      console.log('page.js: /orders');
       app.route = 'orders';
+      document.querySelector('ordering-subapp').$.pages.selected = 0;
       setFocus(app.route);
     });
 
     page('/orders/:name', function(data) {
-      debugger;
-      app.route = 'test';
+      app.route = 'orders';
       app.params = data.params;
       setFocus(app.route);
     });
 
     page('/people', function() {
-      console.log('page.js: /people');
       app.route = 'people';
       setFocus(app.route);
     });
 
-    page('/people/:name', function(data) {
-      debugger;
-      console.log('page.js: /people');
-      app.route = 'person';
-      setFocus(app.route);
-    });
-
     page('/feedback', function() {
-      console.log('page.js: /feedback');
       app.route = 'feedback';
       setFocus(app.route);
     });
@@ -92,10 +80,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       page.redirect(app.baseUrl);
     });
 
-    // add #! before urls
-    page({
-      hashbang: true
-    });
+    page({});
 
   });
 </script>

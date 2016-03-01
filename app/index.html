@@ -12,6 +12,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <html lang="en">
 
 <head>
+  <base href="/">
   <meta charset="utf-8">
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -99,21 +100,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="content">
           <iron-pages attr-for-selected="data-route" selected="{{route}}">
             <section data-route="orders" tabindex="-1">
-              <ordering-subapp index="{{params.index}}"></ordering-subapp>
+              <ordering-subapp name="{{params.name}}"></ordering-subapp>
             </section>
 
             <section data-route="people" tabindex="-1">
               <people-subapp></people-subapp>
-              <a href$="{{baseUrl}}people/Addy">Addy</a>
             </section>
 
             <section data-route="feedback" tabindex="-1">
               <feedback-subapp></feedback-subapp>
             </section>
 
-            <section data-route="person">
-              <h1>Inside person</h1>
-            </section>
           </iron-pages>
         </div>
       </paper-scroll-header-panel>
