@@ -14,13 +14,13 @@
                     <span>#</span>
                 </div>
                 <div class="horizontal layout">
-                    <span class="flex">Team member share: </span>
+                    <span class="flex">Share amount: </span>
                     <currency-display class="spaceonleft" value="{{teamShare}}"></currency-display>
                 </div>
             </div>
             <div class="vertical layout flex totals">
                 <div class="horizontal layout">
-                    <span class="flex">Team: </span>
+                    <span class="flex">Shared: </span>
                     <currency-display class="spaceonleft" value="{{teamTotal}}"></currency-display>
                 </div>
                 <div class="horizontal layout">
@@ -91,7 +91,7 @@
                                         .map(i => i.price * i.quantity))
                                     .reduce((a,b) => a + b, 0.0);
 
-            this.teamShare = this.teamTotal / order.people.filter(p => p.team === order.team).length;
+            this.teamShare = this.teamTotal / order.people.filter(p => p.sharing).length;
 
             var personalitems = order.items.filter(i => i.personal);
 

@@ -1,6 +1,7 @@
 <dom-module id="ordering-subapp">
     <style include="shared-styles"></style>
     <template>
+        <strong>{{index}}</strong>
         <iron-pages id="pages" selected="0">
             <order-card-list on-order-selected="toggle" selected-order="{{order}}"></order-card-list>
             <order-view order="{{order}}" on-view-closed="toggle"></order-view>
@@ -10,6 +11,9 @@
 <script>
     Polymer({
         is: 'ordering-subapp',
+        properties: {
+            index: Number
+        },
         toggle: function () {
             this.$.pages.selected = parseInt(this.$.pages.selected) === 0 ? 1 : 0;
         }

@@ -1,0 +1,53 @@
+<dom-module id="people-subapp">
+  <style include="shared-styles"></style>
+  <style>
+    paper-card { margin: 0.5rem; }
+    .person span { margin-right: 1rem; }
+  </style>
+  <template>
+    <firebase-collection id="fbpeople"
+      location="https://swcoffee.firebaseio.com/people"
+      data="{{people}}">
+    </firebase-collection>
+    <div class="horizontal layout wrap start">
+      <paper-card heading="Add Person">
+        <div class="card-contents">
+            <paper-input id="name"
+              label="Name to add to list"
+              required
+              auto-validate
+              on-change="add">
+            </paper-input>
+        </div>
+      </paper-card>
+      <paper-card heading="People" class="people">
+        <div class="card-contents">
+          <small><em>Switch indicates the user is sharing in the group portion of the order.</em></small>
+          <ul>
+            <template is="dom-repeat" items="{{people}}">
+              <li class="horizontal layout center person">
+                <span class="flex">{{item.name}}</span>
+                <paper-toggle-button checked="{{item.sharing}}"></paper-toggle-button>
+                <paper-icon-button class="end" icon="clear" on-tap="remove"></paper-icon-button>
+              </li>
+            </template>
+          </ul>
+        </div>
+      </paper-card>
+    </div>
+  </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'people-subapp',
+        add: function (e) {
+          this.$.fbpeople.add({
+            name: e.target.value
+          });
+          e.target.value = '';
+        },
+        remove: function (e) {
+          debugger;
+        }
+    });
+</script>

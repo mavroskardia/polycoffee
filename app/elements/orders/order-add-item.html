@@ -2,19 +2,22 @@
     <style include="shared-styles"></style>
     <style>
         paper-tabs { margin-bottom: 1rem; }
+        paper-card {
+            --paper-card-header-image {};
+        }
         .coffee-form > * { margin: 0.25rem 0; }
         .card-contents {
             width: 23rem;
         }
     </style>
     <template>
-        <paper-card class="white" heading="Add Coffee" image="/images/coffeecup2rs.jpg" elevation="1">
+        <paper-card class="white" heading="{{heading}}" image="{{headingimage}}" elevation="1">
             <div class="card-contents vertical layout">
                 <paper-tabs selected="{{selected}}">
                     <paper-tab>Coffee</paper-tab>
                     <paper-tab>Other</paper-tab>
                 </paper-tabs>
-                <iron-pages selected="{{selected}}">
+                <iron-pages selected="{{selected}}" on-iron-select="modifyHeader">
                     <section class="vertical layout coffee-form">
                         <inventory-dropdown on-iron-select="onAddCoffee" item="{{coffee}}" inventory="[[order.inventory]]"></inventory-dropdown>
                         <coffee-bag-size size="{{bagsize}}"></coffee-bag-size>
@@ -44,7 +47,19 @@
             selected: {
                 type: Number,
                 value: () => 0
+            },
+            heading: {
+                type: String,
+                value: h => 'Add Coffee'
+            },
+            headingimage: {
+                type: String,
+                value: hi => '/images/coffeecup2rs.jpg'
             }
+        },
+        modifyHeader: function () {
+            this.heading = this.selected ? "Add Other" : "Add Coffee";
+            this.headingimage = this.selected ? "/images/bolts.jpg" : "/images/coffee.jpg";
         },
         onAddCoffee: function () {
             this.$.addcoffee.disabled = false;

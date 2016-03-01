@@ -1,38 +1,45 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
+
 <!-- shared styles for all elements and index.html -->
 <dom-module id="shared-styles">
-    <template>
-        <style>
-            * { font-weight: 200; }
-            strong { font-weight: 500; }
-            small { color: #888; }
-            .page-title {
-                @apply(--paper-font-display2);
-            }
+  <template>
+    <style>
+      * { font-weight: 200; }
+      strong { font-weight: 500; }
+      small { color: #888; }
 
-            .hidden { display: none; }
+      .hidden { display: none; }
+      .page-title {
+        @apply(--paper-font-display2);
+      }
 
-            paper-fab {
-                position: fixed;
-                bottom: 1rem;
-                right: 2rem;
-            }
+      paper-fab {
+          position: fixed;
+          bottom: 1rem;
+          right: 2rem;
+      }
 
-            paper-card.white {
-                --paper-card-header-color: #fff;
-                --paper-card-header-image-text: {
-                    text-shadow: 2px 2px 1px rgba(0,0,0,0.5);
-                };
-            }
+      paper-card.white {
+          --paper-card-header-color: #fff;
+          --paper-card-header-image-text: {
+              text-shadow: 2px 2px 1px rgba(0,0,0,0.5);
+          };
+      }
 
-            paper-material, paper-card .card-contents { padding: 1rem; }
+      paper-material, paper-card .card-contents { padding: 1rem; }
 
-            paper-button[raised] { background-color: var(--primary-background-color); }
+      paper-button[raised] { background-color: var(--primary-background-color); }
 
-            @media (max-width: 600px) {
-                .page-title {
-                    font-size: 24px!important;
-                }
-            }
-        </style>
-    </template>
+      paper-menu a > *, paper-menu paper-item > *, paper-menu paper-icon-item > * {
+        pointer-events: none;
+      }
+
+      @media (max-width: 600px) {
+        .page-title {
+          font-size: 24px!important;
+        }
+      }
+    </style>
+  </template>
 </dom-module>

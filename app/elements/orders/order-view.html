@@ -175,7 +175,7 @@
                             .map(i => i.quantity * this.bagCost(i) * 100)
                             .reduce((a,b) => a + b, 0.0);
 
-            total += person.team === order.team ? this.getTeamShare(order) : 0;
+            total += person.sharing ? this.getTeamShare(order) : 0;
             return total;
         },
         payOrder: function () {
