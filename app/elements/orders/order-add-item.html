@@ -11,6 +11,7 @@
         }
     </style>
     <template>
+        <paper-toast id="message"></paper-toast>
         <paper-card class="white" heading="{{heading}}" image="{{headingimage}}" elevation="1">
             <div class="card-contents vertical layout">
                 <paper-tabs selected="{{selected}}">
@@ -73,6 +74,11 @@
                                         this.$.quantity.validate());
         },
         addCoffee: function () {
+            if (!this.person) {
+                this.$.message.text = 'Must select a person when the order is personal';
+                this.$.message.show();
+                return;
+            }
             var lineitem = {
                 isCoffee: true,
                 coffee: this.coffee,
