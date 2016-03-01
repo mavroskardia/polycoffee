@@ -159,15 +159,14 @@
                     .reduce((p,c)=> p + c, 0.0);
         },
         getTeamShare: function (order) {
-            var teamTotal = order.items
-                                .filter(i => !i.personal)
+            var teamTotal = teamitems
                                 .map(i => i.quantity * this.bagCost(i) * 100)
                                 .concat(order.items
                                     .filter(i => !i.isCoffee)
-                                    .map(i => parseFloat(i.price) * parseInt(i.quantity)))
+                                    .map(i => i.price * i.quantity))
                                 .reduce((a,b) => a + b, 0.0);
 
-            return teamTotal / order.people.filter(p => p.team == order.team).length;
+            return this.teamTotal / order.people.filter(p => p.sharing).length;
         },
         getOwed: function (order, person) {
             var total = order.items
