@@ -167,7 +167,7 @@
                                     .map(i => i.price * i.quantity))
                                 .reduce((a,b) => a + b, 0.0);
 
-            return this.teamTotal / order.people.filter(p => p.sharing).length;
+            return teamTotal / order.people.filter(p => p.sharing).length;
         },
         getOwed: function (order, person) {
             var total = order.items
