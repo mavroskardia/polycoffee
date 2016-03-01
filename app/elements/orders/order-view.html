@@ -160,7 +160,7 @@
         },
         getTeamShare: function (order) {
             var teamTotal = order.items
-                                .filter(i => !i.personal)
+                                .filter(i => !i.personal && i.isCoffee)
                                 .map(i => i.quantity * this.bagCost(i) * 100)
                                 .concat(order.items
                                     .filter(i => !i.isCoffee)
