@@ -28,10 +28,10 @@
                         <paper-button id="addcoffee" disabled on-tap="addCoffee">Add</paper-button>
                     </section>
                     <section class="vertical layout">
-                        <em>All fields required</em>
+                        <small><em>Parts, equipment, etc. All fields required.</em></small>
                         <paper-input id="name" label="Name" required auto-validate="true" on-change="checkCanAdd"></paper-input>
                         <paper-input id="description" label="Description" required auto-validate="true" on-change="checkCanAdd"></paper-input>
-                        <paper-input id="price" type="number" required min="0" step="0.01" label="Price" auto-validate="true" on-change="checkCanAdd"></paper-input>
+                        <paper-input id="price" type="number" required min="0" max="1000" step="0.01" label="Price" auto-validate="true" on-change="checkCanAdd"></paper-input>
                         <paper-input id="quantity" required value="1" min="0" type="number" auto-validate="true" label="Quantity" on-change="checkCanAdd"></paper-input>
                         <paper-button id="addother" disabled on-tap="addOther">Add</paper-button>
                     </section>

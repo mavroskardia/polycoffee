@@ -27,11 +27,11 @@
             location="https://swcoffee.firebaseio.com/teams"
             data="{{teams}}">
         </firebase-collection>
+        <paper-button id="addbtn" raised class="self-center" on-tap="add">New Order</paper-button>
         <div class="horizontal layout wrap">
             <template is="dom-repeat" items="{{orders}}" sort="reverse">
                 <order-card order="{{item}}"></order-card>
             </template>
-            <paper-button id="addbtn" raised class="self-center" on-tap="add">New Order</paper-button>
         </div>
     </template>
 </dom-module>
