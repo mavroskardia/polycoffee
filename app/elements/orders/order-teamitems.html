@@ -28,7 +28,7 @@
                             <truncate-text class="self-center flex-2" text="{{item.description}}"></truncate-text>
                             <currency-display class="self-center end" value="{{getItemCost(item)}}"></currency-display>
                         </template>
-                        <paper-icon-button hidden$="{{!isOpen}}" icon="clear" class="self-center" on-tap="removeItem"></paper-icon-button>
+                        <paper-icon-button hidden$="{{!isOpen}}" icon="clear" class="self-center" on-tap="fadeoutItem"></paper-icon-button>
                     </div>
                 </template>
             </div>
@@ -38,12 +38,30 @@
 <script>
     Polymer({
         is: 'order-teamitems',
+        behaviors: [Polymer.NeonAnimationRunnerBehavior],
         properties: {
             order: Object,
             isOpen: {
                 type: Boolean,
                 computed: 'orderOpen(order)'
+            },
+            itemToRemove: {
+                type: Object,
+                value: () => null
+            },
+            animationConfig: {
+                value: () => ({
+                    'fadeout': [{
+                        name: 'fade-out-animation'
+                    }],
+                    'fadein': [{
+                        name: 'fade-in-animation'
+                    }]
+                })
             }
+        },
+        listeners: {
+            'neon-animation-finish': 'removeItem'
         },
         orderOpen: o => o.status == 'open',
         bagCost: function (item) {
@@ -54,8 +72,16 @@
         },
         getItemCost: i => parseFloat(i.price) * parseInt(i.quantity),
         getTotalCost: function (item) { return this.bagCost(item) * item.quantity * 100; },
+        fadeoutItem: function (e) {
+            this.itemToRemove = e.model.item;
+            this.getAnimationConfig('fadeout')[0].node = this.querySelectorAll('.items')[e.model.index];
+            this.playAnimation('fadeout');
+        },
         removeItem: function (e) {
-            this.fire('remove-item', e.model.item);
+            if (this.itemToRemove) {
+                this.fire('remove-item', this.itemToRemove);
+                this.itemToRemove = null;
+            }
         },
         getTeamItems: order => [].filter.call(order.items || [], i => !i.personal)
     });

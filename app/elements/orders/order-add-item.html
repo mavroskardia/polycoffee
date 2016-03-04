@@ -49,6 +49,10 @@
                 type: Number,
                 value: () => 0
             },
+            ispersonal: {
+                type: Boolean,
+                value: () => false
+            },
             heading: {
                 type: String,
                 value: h => 'Add Coffee'
@@ -74,7 +78,7 @@
                                         this.$.quantity.validate());
         },
         addCoffee: function () {
-            if (!this.person) {
+            if (this.ispersonal && !this.person) {
                 this.$.message.text = 'Must select a person when the order is personal';
                 this.$.message.show();
                 return;

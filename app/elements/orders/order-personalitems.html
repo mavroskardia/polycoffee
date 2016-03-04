@@ -20,7 +20,7 @@
                         </div>
                         <truncate-text class="self-center flex" text="{{item.coffee.name}}"></truncate-text>
                         <currency-display class="self-center end" value="{{getTotalCost(item)}}"></currency-display>
-                        <paper-icon-button class="self-center end" hidden$="{{!isOpen}}" icon="clear" on-tap="removeItem"></paper-icon-button>
+                        <paper-icon-button class="self-center end" hidden$="{{!isOpen}}" icon="clear" on-tap="fadeout"></paper-icon-button>
                     </div>
                 </template>
             </div>
@@ -30,16 +30,37 @@
 <script>
     Polymer({
         is: 'order-personalitems',
+        behaviors: [Polymer.NeonAnimationRunnerBehavior],
         properties: {
             order: Object,
             isOpen: {
                 type: Boolean,
                 computed: 'orderOpen(order)'
+            },
+            itemToRemove: {
+                type: Object,
+                value: () => null
+            },
+            animationConfig: {
+                value: () => ({
+                    'fadeout': [{name: 'fade-out-animation'}]
+                })
             }
         },
+        listeners: {
+            'neon-animation-finish': 'removeItem'
+        },
         orderOpen: o => o.status == 'open',
+        fadeout: function (e) {
+            this.itemToRemove = e.model.item;
+            this.getAnimationConfig('fadeout')[0].node = this.querySelectorAll('.items')[e.model.index];
+            this.playAnimation('fadeout');
+        },
         removeItem: function (e) {
-            this.fire('remove-item', e.model.item);
+            if (this.itemToRemove) {
+                this.fire('remove-item', this.itemToRemove);
+                this.itemToRemove = null;
+            }
         },
         bagCost: function (item) {
             return this.order.prices.

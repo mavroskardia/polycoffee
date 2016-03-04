@@ -102,9 +102,9 @@
             }
         },
         orderOpen: function (order) { return order.status === 'open'; },
-        isOrderOpen: o => o.status === 'open',
-        isOrderClosed: o => o.status === 'closed',
-        isOrderPaid: o => o.status === 'paid',
+        isOrderOpen: o => o && o.status === 'open',
+        isOrderClosed: o => o && o.status === 'closed',
+        isOrderPaid: o => o && o.status === 'paid',
         removeItem: function (e, item) {
             var idx = this.order.items.indexOf(item);
             if (idx > -1) {

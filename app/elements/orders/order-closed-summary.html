@@ -27,7 +27,7 @@
             order: Object
         },
         combinedItems: function (order) {
-            if (!order.items) { return []; }
+            if (!order || !order.items) { return []; }
             var bycoffee = {};
             order.items.filter(i=>i.isCoffee).forEach(function (i) {
                 if (i.coffee.name in bycoffee) {

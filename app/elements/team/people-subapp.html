@@ -28,7 +28,7 @@
               <li class="horizontal layout center person">
                 <span class="flex">{{item.name}}</span>
                 <paper-toggle-button checked="{{item.sharing}}"></paper-toggle-button>
-                <paper-icon-button class="end" icon="clear" on-tap="remove"></paper-icon-button>
+                <paper-icon-button class="end" icon="clear" on-tap="fadeout"</paper-icon-button>
               </li>
             </template>
           </ul>
@@ -40,14 +40,35 @@
 <script>
     Polymer({
         is: 'people-subapp',
+        behaviors: [Polymer.NeonAnimationRunnerBehavior],
+        properties: {
+          animationConfig: {
+            value: () => [{
+              name: 'fade-out-animation'
+            }]
+          },
+          indexToRemove: {
+            type: Number,
+            value: () => -1
+          }
+        },
+        listeners: {
+          'neon-animation-finish': 'remove'
+        },
         add: function (e) {
           this.$.fbpeople.add({
             name: e.target.value
           });
           e.target.value = '';
         },
+        fadeout: function (e) {
+          this.indexToRemove = e.model.index;
+          this.getAnimationConfig()[0].node = this.querySelectorAll('.person')[e.model.index];
+          this.playAnimation();
+        },
         remove: function (e) {
-          debugger;
+          this.splice('people', this.indexToRemove, 1);
+          this.indexToRemove = -1;
         }
     });
 </script>
