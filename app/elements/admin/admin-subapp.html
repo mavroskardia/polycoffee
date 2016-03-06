@@ -1,0 +1,19 @@
+<dom-module id="admin-subapp">
+    <style include"shared-styles"></style>
+    <style>
+        admin-outstanding-orders,
+        admin-payment-summary
+        { margin: 0.5rem; }
+    </style>
+    <template>
+        <div class="horizontal layout wrap start">
+            <admin-outstanding-orders></admin-outstanding-orders>
+            <admin-payment-summary></admin-payment-summary>
+        </div>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'admin-subapp'
+    });
+</script>

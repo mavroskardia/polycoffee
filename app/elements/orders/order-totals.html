@@ -10,18 +10,18 @@
             <div class="vertical layout">
                 <div class="horizontal layout">
                     <span class="flex">Total weight: </span>
-                    <strong class="spaceonleft">{{totalWeight}}</strong>
+                    <strong class="spaceonleft">[[totalWeight]]</strong>
                     <span>#</span>
                 </div>
                 <div class="horizontal layout">
                     <span class="flex">Share amount: </span>
-                    <currency-display class="spaceonleft" value="{{teamShare}}"></currency-display>
+                    <currency-display class="spaceonleft" value="{{sharedPerCapita}}"></currency-display>
                 </div>
             </div>
             <div class="vertical layout flex totals">
                 <div class="horizontal layout">
                     <span class="flex">Shared: </span>
-                    <currency-display class="spaceonleft" value="{{teamTotal}}"></currency-display>
+                    <currency-display class="spaceonleft" value="{{sharedTotal}}"></currency-display>
                 </div>
                 <div class="horizontal layout">
                     <span class="flex">Personal: </span>
@@ -29,7 +29,7 @@
                 </div>
                 <div class="horizontal layout">
                     <span class="flex">Grand: </span>
-                    <currency-display class="spaceonleft" value="{{grandTotal(teamTotal, personalTotal)}}"></currency-display>
+                    <currency-display class="spaceonleft" value="{{grandTotal}}"></currency-display>
                 </div>
             </div>
         </div>
@@ -38,77 +38,6 @@
 <script>
     Polymer({
         is: 'order-totals',
-        properties: {
-            order: {
-                type: Object,
-                observer: '_orderChanged'
-            },
-            totalWeight: {
-                type: Number,
-                value: () => 0
-            },
-            teamTotal: {
-                type: Number,
-                value: () => 0
-            },
-            teamShare: {
-                type: Number,
-                value: () => 0
-            },
-            personalTotal: {
-                type: Number,
-                value: () => 0
-            }
-        },
-        _orderChanged: function (newOrder) {
-            if (!newOrder) { return; }
-            this.calculateTotals(newOrder);
-        },
-        calculateTotals: function (order) {
-            if (!order.items) {
-                this.teamTotal = 0;
-                this.totalWeight = 0;
-                this.teamShare = 0;
-                this.numTeamItems = 0;
-                this.numPersonalItems = 0;
-                this.personalTotal = 0;
-                return;
-            }
-
-            var teamitems = order.items.filter(i => i.isCoffee && !i.personal);
-
-            this.numTeamItems = order.items.filter(i => !i.personal).length;
-
-            this.totalWeight = order.items
-                                    .filter(i => i.isCoffee)
-                                    .map(i => i.size * i.quantity)
-                                    .reduce((a,b) => a + b, 0.0);
-
-            this.teamTotal = teamitems
-                                    .map(i => i.quantity * this.bagCost(i) * 100)
-                                    .concat(order.items
-                                        .filter(i => !i.isCoffee)
-                                        .map(i => i.price * i.quantity))
-                                    .reduce((a,b) => a + b, 0.0);
-
-            this.teamShare = this.teamTotal / order.people.filter(p => p.sharing).length;
-
-            var personalitems = order.items.filter(i => i.personal);
-
-            this.numPersonalItems = personalitems.length;
-
-            this.personalTotal = personalitems
-                                    .map(i => i.quantity * this.bagCost(i) * 100)
-                                    .reduce((a,b) => a + b, 0.0);
-        },
-        bagCost: function (item) {
-            return this.order.prices
-                    .filter(p => p.retail === item.coffee.price)
-                    .map(p => p.wholesale[item.size == 1 ? 0 : item.size == 2 ? 1 : 2])
-                    .reduce((p,c)=> p + c, 0.0);
-        },
-        grandTotal: function (team, personal) {
-            return team + personal;
-        }
+        behaviors: [OrderBehavior]
     });
 </script>

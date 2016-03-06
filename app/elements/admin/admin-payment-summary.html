@@ -1,0 +1,28 @@
+<dom-module id="admin-payment-summary">
+	<style inclue="shared-styles"></style>
+	<style>
+		admin-order-payment-entry { margin: 0.5rem; }
+	</style>
+	<template>
+
+		<firebase-collection id="fborders"
+			location="https://swcoffee.firebaseio.com/orders"
+			order-by-child="status"
+			equal-to="paid"
+			data="{{orders}}">
+		</firebase-collection>
+
+		<paper-card heading="Payment Summary">
+			<div class="card-contents">
+				<template is="dom-repeat" items="{{orders}}">
+					<admin-order-payment-entry order="{{item}}"></admin-order-payment-entry>
+				</template>
+			</div>
+		</paper-card>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'admin-payment-summary'
+	});
+</script>

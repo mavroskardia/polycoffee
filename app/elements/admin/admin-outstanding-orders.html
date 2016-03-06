@@ -1,0 +1,21 @@
+<dom-module id="admin-outstanding-orders">
+	<style include="shared-styles"></style>
+	<style></style>
+	<template>
+		<paper-card heading="Orders accepting payment">
+        	<div class="card-contents">
+                <template is="dom-repeat" items="{{orders}}">
+                    <li>
+                        <order-totals order="{{item}}"></order-totals>
+                    </li>
+                </template>
+        	</div>
+        </paper-card>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'admin-outstanding-orders',
+		behaviors: [OrderBehavior]
+	});
+</script>

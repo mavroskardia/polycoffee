@@ -1,0 +1,87 @@
+<script>
+	OrderBehavior = {
+		properties: {
+			order: {
+				type: Object,
+				notify: true
+			},
+            sharedTotal: {
+                type: Number,
+                notify: true,
+                computed: '_computeSharedTotal(order)'
+            },
+            totalWeight: {
+                type: Number,
+                notify: true,
+                computed: '_computeTotalWeight(order)'
+            },
+            sharedPerCapita: {
+                type: Number,
+                notify: true,
+                computed: '_computeSharedPerCapita(order, sharedTotal)'
+            },
+            numSharedItems: {
+                type: Number,
+                notify: true,
+                computed: '_computeNumSharedItems(order)'
+            },
+            numPersonalItems: {
+                type: Number,
+                notify: true,
+                computed: '_computeNumPersonalItems(order)'
+            },
+            personalTotal: {
+                type: Number,
+                notify: true,
+                computed: '_computePersonalTotal(order)'
+            },
+            grandTotal: {
+                type: Number,
+                notify: true,
+                computed: '_computeGrandTotal(order)'
+            },
+            isOpen: {
+                type: Boolean,
+                notify: true,
+                computed: '_isOrderStatus(order, "open")'
+            },
+            isClosed: {
+                type: Boolean,
+                notify: true,
+                computed: '_isOrderStatus(order, "closed")'
+            },
+            isPaid: {
+                type: Boolean,
+                notify: true,
+                computed: '_isOrderStatus(order, "paid")'
+            },
+		},
+        _isOrderStatus: (o, s) => o.status === s,
+        getTeamItems: (o) => (o.items || []).filter(i => !i.personal),
+        getPersonalItems: (o) => (o.items || []).filter(i => i.personal),
+        lineitemCost: (o, i) => OrderBehavior._bagCost(o, i) * i.quantity * 100,
+        _computeSharedTotal: (o) => (o.items || [])
+                                        .filter(i => i.isCoffee && !i.personal)
+                                        .map(i => i.quantity * OrderBehavior._bagCost(o,i) * 100)
+                                        .concat((o.items || [])
+                                            .filter(i => !i.isCoffee)
+                                            .map(i => i.price * i.quantity))
+                                        .reduce((a,b) => a + b, 0.0),
+        _computeTotalWeight: o => (o.items || [])
+                                    .filter(i => i.isCoffee)
+                                    .map(i => i.size * i.quantity)
+                                    .reduce((a,b) => a + b, 0.0),
+        _computeSharedPerCapita: (o, st) => st / o.people.filter(p => p.sharing).length,
+        _computeNumSharedItems: o => (o.items || []).filter(i => i.isCoffee && !i.personal).length,
+        _computeNumPersonalItems: o => (o.items || []).filter(i => i.personal).length,
+        _computePersonalTotal: (o) => (o.items || [])
+                                        .filter(i => i.personal)
+                                        .map(i => i.quantity * OrderBehavior._bagCost(o,i) * 100)
+                                        .reduce((a,b) => a + b, 0.0),
+        _bagCost: (o,i) => (!o ? 0: o.prices
+                            .filter(p => p.retail === i.coffee.price)
+                            .map(p => p.wholesale[i.size == 1 ? 0 : i.size == 2 ? 1 : 2])
+                            .reduce((p,c)=> p + c, 0.0)),
+        _computeGrandTotal: function () { return this.sharedTotal + this.personalTotal; }
+	};
+</script>

@@ -18,7 +18,7 @@
                                 <span>{{item.size}}<span>#</span></span>
                             </div>
                             <truncate-text class="self-center flex" text="{{item.coffee.name}}"></truncate-text>
-                            <currency-display class="self-center end" value="{{getTotalCost(item)}}"></currency-display>
+                            <currency-display class="self-center end" value="{{lineitemCost(order, item)}}"></currency-display>
                         </template>
                         <template is="dom-if" if="{{!item.isCoffee}}">
                             <div class="self-center" title="Quantity">
@@ -38,13 +38,8 @@
 <script>
     Polymer({
         is: 'order-teamitems',
-        behaviors: [Polymer.NeonAnimationRunnerBehavior],
+        behaviors: [OrderBehavior, Polymer.NeonAnimationRunnerBehavior],
         properties: {
-            order: Object,
-            isOpen: {
-                type: Boolean,
-                computed: 'orderOpen(order)'
-            },
             itemToRemove: {
                 type: Object,
                 value: () => null
@@ -63,15 +58,7 @@
         listeners: {
             'neon-animation-finish': 'removeItem'
         },
-        orderOpen: o => o.status == 'open',
-        bagCost: function (item) {
-            return this.order.prices
-                    .filter(p => p.retail == item.coffee.price)
-                    .map(p => p.wholesale[item.size == 1 ? 0 : item.size == 2 ? 1 : 2])
-                    .reduce((p,c)=> p + c, 0.0);
-        },
         getItemCost: i => parseFloat(i.price) * parseInt(i.quantity),
-        getTotalCost: function (item) { return this.bagCost(item) * item.quantity * 100; },
         fadeoutItem: function (e) {
             this.itemToRemove = e.model.item;
             this.getAnimationConfig('fadeout')[0].node = this.querySelectorAll('.items')[e.model.index];
@@ -82,7 +69,6 @@
                 this.fire('remove-item', this.itemToRemove);
                 this.itemToRemove = null;
             }
-        },
-        getTeamItems: order => [].filter.call(order.items || [], i => !i.personal)
+        }
     });
 </script>

@@ -9,13 +9,17 @@
 <script>
     Polymer({
         is: 'currency-display',
-        asCurrency: val => (val/100).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'),
         properties: {
             value: {
                 type: Number,
                 readonly: true
             },
+            noadjust: Boolean,
             highlight: String
+        },
+        asCurrency: function (val) {
+            val = this.noadjust ? val : val / 100;
+            return (val).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
         }
     });
 </script>

@@ -1,0 +1,19 @@
+<dom-module id="collapse-box">
+	<style inclue="shared-styles"></style>
+	<style></style>
+	<template>
+		<paper-icon-button icon="{{icon}}" on-tap="toggle"></paper-icon-button>
+		<content></content>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'collapse-box',
+		properties: {
+			icon: String
+		},
+		toggle: function (e) {
+
+		}
+	});
+</script>
