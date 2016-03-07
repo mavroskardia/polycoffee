@@ -40,6 +40,16 @@
                 notify: true,
                 computed: '_computeGrandTotal(order)'
             },
+            paidTotal: {
+                type: Number,
+                notify: true,
+                computed: '_computePaidTotal(order)'
+            },
+            remaining: {
+                type: Number,
+                notify: true,
+                computed: '_computeRemaining(grandTotal, paidTotal)'
+            },
             isOpen: {
                 type: Boolean,
                 notify: true,
@@ -60,6 +70,10 @@
         getTeamItems: (o) => (o.items || []).filter(i => !i.personal),
         getPersonalItems: (o) => (o.items || []).filter(i => i.personal),
         lineitemCost: (o, i) => OrderBehavior._bagCost(o, i) * i.quantity * 100,
+        _computePaidTotal: (o) => (o.payments || [])
+                                    .map(p => p.paid)
+                                    .reduce((a,b) => parseFloat(a) + parseFloat(b), 0.0),
+        _computeRemaining: (gt, pt) => gt - pt,
         _computeSharedTotal: (o) => (o.items || [])
                                         .filter(i => i.isCoffee && !i.personal)
                                         .map(i => i.quantity * OrderBehavior._bagCost(o,i) * 100)

@@ -1,46 +1,59 @@
 <dom-module id="admin-order-payment-entry">
     <style include="shared-styles"></style>
     <style>
-        h3 { padding-left: 0.5rem; }
+        header { padding-left: 0.5rem; }
         table { width: 100%; text-align: center; border-collapse: collapse; }
         thead tr th { font-weight: 400; border-bottom: solid 1px var(--divider-color); }
         th, td { padding: 0.25rem 1rem; }
         .right { text-align: right; }
     </style>
     <template>
-        <header>
-            <h2>{{toDate(order.date)}}</h2>
-            <small>{{grandTotal}}</small>
-        </header>
-        <h3></h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Person</th>
-                    <th class="right">Owed</th>
-                    <th class="right">Paid</th>
-                </tr>
-            </thead>
-            <tbody>
-                <template is="dom-repeat" items="{{order.payments}}">
-                <tr>
-                    <td>{{item.person.name}}</td>
-                    <td class="right">
-                        <currency-display
-                            noadjust
-                            highlight="{{getHighlight(item.owed, item.paid)}}"
-                            value="{{item.owed}}">
-                        </currency-display>
-                    </td>
-                    <td class="right">
-                        <paper-input type="number" value="[[fixValue(item.paid)]]" on-change="updatePayment" min="0" max="10000" step="0.01" label="Payment">
-                            <div prefix>$</div>
-                        </paper-input>
-                    </td>
-                </tr>
-                </template>
-            </tbody>
-        </table>
+            <header>
+                <h2>{{toDate(order.date)}}</h2>
+            </header>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Person</th>
+                        <th class="right">Owed</th>
+                        <th class="right">Paid</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template is="dom-repeat" items="{{order.payments}}">
+                    <tr>
+                        <td>{{item.person.name}}</td>
+                        <td class="right">
+                            <currency-display
+                                noadjust
+                                highlight="{{getHighlight(item.owed, item.paid)}}"
+                                value="{{item.owed}}">
+                            </currency-display>
+                        </td>
+                        <td class="right">
+                            <paper-input type="number" value="[[fixValue(item.paid)]]" on-change="updatePayment" min="0" max="10000" step="0.01" label="Payment">
+                                <div prefix>$</div>
+                            </paper-input>
+                        </td>
+                    </tr>
+                    </template>
+                    <tr>
+                        <td>Owed Total</td>
+                        <td></td>
+                        <td class="right"><currency-display noadjust value="{{grandTotal}}"></currency-display></td>
+                    </tr>
+                    <tr>
+                        <td>Paid Total</td>
+                        <td></td>
+                        <td class="right"><currency-display noadjust value="{{paidTotal}}"></currency-display></td>
+                    </tr>
+                    <tr>
+                        <td>Over/Under</td>
+                        <td></td>
+                        <td class="right"><currency-display noadjust value="{{remaining}}"></currency-display></td>
+                    </tr>
+                </tbody>
+            </table>
     </template>
 
 </dom-module>
