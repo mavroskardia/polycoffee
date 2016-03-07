@@ -7,6 +7,7 @@
   <template>
     <firebase-collection id="fbpeople"
       location="https://swcoffee.firebaseio.com/people"
+      on-firebase-child-added="sortPeople"
       data="{{people}}">
     </firebase-collection>
     <div class="horizontal layout wrap start">
@@ -20,11 +21,11 @@
             </paper-input>
         </div>
       </paper-card>
-      <paper-card heading="People" class="people">
+      <paper-card heading="People">
         <div class="card-contents">
           <small><em>Switch indicates the user is sharing in the group portion of the order.</em></small>
           <ul>
-            <template is="dom-repeat" items="{{people}}">
+            <template is="dom-repeat" items="{{orderedPeople}}">
               <li class="horizontal layout center person">
                 <span class="flex">{{item.name}}</span>
                 <paper-toggle-button checked="{{item.sharing}}"></paper-toggle-button>
@@ -47,13 +48,21 @@
               name: 'fade-out-animation'
             }]
           },
-          indexToRemove: {
+          keyToRemove: {
             type: Number,
             value: () => -1
+          },
+          orderedPeople: {
+            type: Array,
+            value: () => []
           }
         },
         listeners: {
           'neon-animation-finish': 'remove'
+        },
+        sortPeople: function (e) {
+          this.set('orderedPeople', this.people.slice());
+          this.orderedPeople.sort((a,b) => a.name.charCodeAt(0) > b.name.charCodeAt(0) ? 1 : -1);
         },
         add: function (e) {
           this.$.fbpeople.add({
@@ -62,13 +71,15 @@
           e.target.value = '';
         },
         fadeout: function (e) {
-          this.indexToRemove = e.model.index;
+          this.keyToRemove = e.model.item.__firebaseKey__;
           this.getAnimationConfig()[0].node = this.querySelectorAll('.person')[e.model.index];
           this.playAnimation();
         },
         remove: function (e) {
-          this.splice('people', this.indexToRemove, 1);
-          this.indexToRemove = -1;
+          let index = this.people.findIndex((e,i,a) => e.__firebaseKey__ === this.keyToRemove);
+          this.splice('people', index, 1);
+          this.keyToRemove = null;
+          this.sortPeople();
         }
     });
 </script>
