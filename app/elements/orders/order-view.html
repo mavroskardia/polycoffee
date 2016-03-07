@@ -55,7 +55,7 @@
                         on-add-other="addItemToOrder">
                     </order-add-item>
                     <order-closed-summary hidden$="{{!isClosed}}" order="{{order}}"></order-closed-summary>
-                    <order-payments hidden$="{{!isPaid}}" order="{{order}}"></order-payments>
+                    <order-payments hidden$="{{isOpen}}" order="{{order}}"></order-payments>
                 </div>
                 <div class="layout vertical">
                     <order-teamitems order="{{order}}" on-remove-item="removeItem"></order-teamitems>

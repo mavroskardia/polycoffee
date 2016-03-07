@@ -15,14 +15,17 @@
                 <order-totals order="[[order]]"></order-totals>
             </div>
             <div class="card-actions">
-                <template is="dom-if" if="{{isOpen(order)}}">
+                <template is="dom-if" if="{{isOpen}}">
                     <span>Accepting orders</span>
                 </template>
-                <template is="dom-if" if="{{isClosed(order)}}">
+                <template is="dom-if" if="{{isClosed}}">
                     <span>Ordered</span>
                 </template>
-                <template is="dom-if" if="{{isPaid(order)}}">
-                    <span>Accepting payment</span>
+                <template is="dom-if" if="{{isPaid}}">
+                    <span>Accepting payments</span>
+                </template>
+                <template is="dom-if" if="{{isComplete}}">
+                    <span>Order complete on <span>{{toDate(order.complete_date)}}</span>
                 </template>
             </div>
             <paper-ripple></paper-ripple>
@@ -32,11 +35,8 @@
 <script>
     Polymer({
         is: 'order-card',
+        behaviors: [OrderBehavior],
         properties: {
-            order: {
-                type: Object,
-                notify: true
-            },
             selected: {
                 type: Boolean,
                 value: false,
@@ -55,9 +55,6 @@
         select: function () {
             this.fire('order-selected', this);
         },
-        isOpen: o => o.status == 'open',
-        isClosed: o => o.status == 'closed',
-        isPaid: o => o.status == 'paid',
         toDate: t => new Date(t).toLocaleDateString()
     });
 </script>

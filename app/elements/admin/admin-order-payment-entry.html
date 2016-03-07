@@ -1,77 +1,94 @@
 <dom-module id="admin-order-payment-entry">
     <style include="shared-styles"></style>
     <style>
-        header { padding-left: 0.5rem; }
+        header { padding: 0 0.5rem; cursor: pointer; }
         table { width: 100%; text-align: center; border-collapse: collapse; }
         thead tr th { font-weight: 400; border-bottom: solid 1px var(--divider-color); }
         th, td { padding: 0.25rem 1rem; }
         .right { text-align: right; }
+        .totals { margin-left: 1rem; font-size: 80%; }
+        .totals > * { margin: 0.25rem; }
     </style>
     <template>
-            <header>
+        <div>
+            <header class="horizontal layout center" on-tap="toggle">
+                <paper-icon-button icon="{{icon}}" on-tap="toggle"></paper-icon-button>
                 <h2>{{toDate(order.date)}}</h2>
+                <div class="totals horizontal layout center flex">
+                    <currency-display value="{{grandTotal}}"></currency-display>
+                    <span> - </span>
+                    <currency-display value="{{paidTotal}}"></currency-display>
+                    <span> = </span>
+                    <currency-display highlight="{{getRemainingHighlight(remaining, grandTotal)}}" value="{{remaining}}"></currency-display>
+                </div>
             </header>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Person</th>
-                        <th class="right">Owed</th>
-                        <th class="right">Paid</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <template is="dom-repeat" items="{{order.payments}}">
-                    <tr>
-                        <td>{{item.person.name}}</td>
-                        <td class="right">
-                            <currency-display
-                                noadjust
-                                highlight="{{getHighlight(item.owed, item.paid)}}"
-                                value="{{item.owed}}">
-                            </currency-display>
-                        </td>
-                        <td class="right">
-                            <paper-input type="number" value="[[fixValue(item.paid)]]" on-change="updatePayment" min="0" max="10000" step="0.01" label="Payment">
-                                <div prefix>$</div>
-                            </paper-input>
-                        </td>
-                    </tr>
-                    </template>
-                    <tr>
-                        <td>Owed Total</td>
-                        <td></td>
-                        <td class="right"><currency-display noadjust value="{{grandTotal}}"></currency-display></td>
-                    </tr>
-                    <tr>
-                        <td>Paid Total</td>
-                        <td></td>
-                        <td class="right"><currency-display noadjust value="{{paidTotal}}"></currency-display></td>
-                    </tr>
-                    <tr>
-                        <td>Over/Under</td>
-                        <td></td>
-                        <td class="right"><currency-display noadjust value="{{remaining}}"></currency-display></td>
-                    </tr>
-                </tbody>
-            </table>
+            <iron-collapse id="collapse">
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Person</th>
+                                <th class="right">Owed</th>
+                                <th class="right">Paid</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template is="dom-repeat" items="{{order.payments}}">
+                            <tr>
+                                <td>{{item.person.name}}</td>
+                                <td class="right">
+                                    <currency-display
+                                        highlight="{{getHighlight(item.owed, item.paid)}}"
+                                        value="{{item.owed}}">
+                                    </currency-display>
+                                </td>
+                                <td class="right">
+                                    <paper-input type="number" no-label-float value="[[fixValue(item.paid)]]" on-change="updatePayment" min="0" max="10000" step="0.01" label="Payment">
+                                        <div prefix>$</div>
+                                    </paper-input>
+                                </td>
+                            </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                    <paper-button id="completebtn" disabled="[[remainingGreaterThanZero(remaining)]]" on-tap="markComplete">Order Complete</paper-button>
+                </div>
+            </iron-collapse>
+        </div>
     </template>
-
 </dom-module>
 <script>
     Polymer({
         is: 'admin-order-payment-entry',
         behaviors: [OrderBehavior],
-        getHighlight: function (owed, paid) {
-            return paid >= owed ? 'green' : 'red';
-        },
-        updatePayment: function (e) {
-            // need to do this instead of the two-way binding because its bugged
-            if (e.target.validate()) {
-                var path = 'order.payments.' + e.model.index + '.paid';
-                this.set(path, parseFloat(e.target.value));
+        properties: {
+            icon: {
+                type: String,
+                value: () => 'expand-more'
             }
         },
-        fixValue: v => parseFloat(v).toFixed(2),
+        toggle: function (e) {
+            this.icon = this.$.collapse.opened ? 'expand-more' : 'expand-less';
+            this.$.collapse.toggle();
+        },
+        getHighlight: (o, p) => p >= o ? 'green' : 'red',
+        getRemainingHighlight: (r, g) => g + r > 0 ? 'red' : 'green',
+        updatePayment: function (e) {
+            if (e.target.validate()) {
+                var path = 'order.payments.' + e.model.index + '.paid';
+                this.set(path, parseFloat(e.target.value) * 100);
+            }
+        },
+        remainingGreaterThanZero: r => r > 0,
+        markComplete: function (e) {
+            // TODO: need to remove all of the magic string urls peppered throughout
+            var ref = new Firebase('https://swcoffee.firebaseio.com/orders/' + this.order.__firebaseKey__);
+            ref.update({
+                'complete_date': new Date().getTime(),
+                'status': 'complete'
+            });
+        },
+        fixValue: v => (parseFloat(v)/100.0).toFixed(2),
         toDate: t => new Date(t).toLocaleDateString()
     });
 </script>

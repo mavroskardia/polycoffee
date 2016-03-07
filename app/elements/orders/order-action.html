@@ -1,26 +1,24 @@
 <dom-module id="order-action">
     <style include="shared-styles"></style>
     <template>
-        <template is="dom-if" if="{{isOpen(order)}}">
+        <template is="dom-if" if="{{isOpen}}">
             <paper-button on-tap="close">Close Order</paper-button>
         </template>
-        <template is="dom-if" if="{{isClosed(order)}}">
+        <template is="dom-if" if="{{isClosed}}">
             <paper-button on-tap="pay">Pay</paper-button>
         </template>
-        <template is="dom-if" if="{{isPaid(order)}}">
+        <template is="dom-if" if="{{isPaid}}">
             <strong>Paid</strong>
+        </template>
+        <template is="dom-if" if="{{isComplete}}">
+            <strong>Order Complete</strong>
         </template>
     </template>
 </dom-module>
 <script>
     Polymer({
         is: 'order-action',
-        properties: {
-            order: Object
-        },
-        isOpen: o => o.status == 'open',
-        isClosed: o => o.status == 'closed',
-        isPaid: o => o.status == 'paid',
+        behaviors: [OrderBehavior],
         close: function () { this.fire('order-closed'); },
         pay: function () { this.fire('order-paid'); }
     });

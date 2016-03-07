@@ -65,6 +65,11 @@
                 notify: true,
                 computed: '_isOrderStatus(order, "paid")'
             },
+            isComplete: {
+                type: Boolean,
+                notify: true,
+                computed: '_isOrderStatus(order, "complete")'
+            }
 		},
         _isOrderStatus: (o, s) => o.status === s,
         getTeamItems: (o) => (o.items || []).filter(i => !i.personal),
