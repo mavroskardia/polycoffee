@@ -106,7 +106,7 @@
                                         .filter(i => i.personal)
                                         .map(i => i.quantity * OrderBehavior._bagCost(o,i) * 100)
                                         .reduce((a,b) => a + b, 0.0),
-        _bagCost: (o,i) => (!o ? 0: o.prices
+        _bagCost: (o,i) => (!o || !i.isCoffee ? 0 : (o.prices || [])
                             .filter(p => p.retail === i.coffee.price)
                             .map(p => p.wholesale[i.size == 1 ? 0 : i.size == 2 ? 1 : 2])
                             .reduce((p,c)=> p + c, 0.0)),
