@@ -3,13 +3,17 @@
     <style>
         paper-card { margin: 0.5rem; }
         small { margin-right: 0.5rem; padding-top: 2px; }
-        p { margin: 0; }
+        p { margin: 0; text-overflow: clip; }
         .feedback {
             min-width: 30rem;
         }
         .entry {
             border-bottom: solid 1px #eee;
             padding: 0.5rem;
+            text-overflow: clip;
+        }
+        .recent {
+            max-width: 30rem;
         }
     </style>
     <template>
@@ -26,7 +30,7 @@
                     <paper-button on-tap="submit">Submit Feedback</paper-button>
                 </div>
             </paper-card>
-            <paper-card heading="Recent Feedback" class="flex">
+            <paper-card heading="Recent Feedback" class="flex recent">
                 <div class="card-contents">
                     <template is="dom-repeat" items="{{feedbacks}}">
                         <div class="horizontal layout start entry">
