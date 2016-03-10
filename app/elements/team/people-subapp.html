@@ -3,6 +3,7 @@
   <style>
     paper-card { margin: 0.5rem; }
     .person span { margin-right: 1rem; }
+    .maxw { max-width: 30rem; }
   </style>
   <template>
     <firebase-collection id="fbpeople"
@@ -21,21 +22,22 @@
             </paper-input>
         </div>
       </paper-card>
-      <paper-card heading="People">
+      <paper-card class="maxw" heading="People">
         <div class="card-contents">
           <small><em>Switch indicates the user is sharing in the group portion of the order.</em></small>
           <ul>
             <template is="dom-repeat" items="{{orderedPeople}}">
               <li class="horizontal layout center person">
-                <span class="flex">{{item.name}}</span>
+                <truncate-text text="{{item.name}}" class="flex"></truncate-text>
                 <paper-toggle-button checked="{{item.sharing}}"></paper-toggle-button>
-                <paper-icon-button class="end" icon="clear" on-tap="fadeout"</paper-icon-button>
+                <paper-icon-button class="end" icon="clear" on-tap="iremove"</paper-icon-button>
               </li>
             </template>
           </ul>
         </div>
       </paper-card>
     </div>
+    <paper-toast id="message"></paper-toast>
   </template>
 </dom-module>
 <script>
@@ -65,15 +67,26 @@
           this.orderedPeople.sort((a,b) => a.name.charCodeAt(0) > b.name.charCodeAt(0) ? 1 : -1);
         },
         add: function (e) {
-          this.$.fbpeople.add({
-            name: e.target.value
-          });
-          e.target.value = '';
+          if (this.$.name.validate() && this.$.name.value.trim()) {
+            if (this.people.filter(p => p.name == this.$.name.value.trim()).length === 0) {
+              this.$.fbpeople.add({
+                name: e.target.value
+              });
+              e.target.value = '';
+            } else {
+              this.$.message.show({'text':'Cannot add duplicate name'});
+            }
+          }
         },
         fadeout: function (e) {
           this.keyToRemove = e.model.item.__firebaseKey__;
           this.getAnimationConfig()[0].node = this.querySelectorAll('.person')[e.model.index];
           this.playAnimation();
+        },
+        iremove: function (e) {
+          var idx = this.people.indexOf(e.model.item);
+          this.splice('people', idx, 1);
+          this.sortPeople();
         },
         remove: function (e) {
           var index = this.people.findIndex((e,i,a) => e.__firebaseKey__ === this.keyToRemove);

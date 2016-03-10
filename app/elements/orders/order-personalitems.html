@@ -20,7 +20,7 @@
                         </div>
                         <truncate-text class="self-center flex" text="{{item.coffee.name}}"></truncate-text>
                         <currency-display class="self-center end" value="{{lineitemCost(order, item)}}"></currency-display>
-                        <paper-icon-button class="self-center end" hidden$="{{!isOpen}}" icon="clear" on-tap="fadeout"></paper-icon-button>
+                        <paper-icon-button class="self-center end" hidden$="{{!isOpen}}" icon="clear" on-tap="remove"></paper-icon-button>
                     </div>
                 </template>
             </div>
@@ -49,6 +49,9 @@
             this.itemToRemove = e.model.item;
             this.getAnimationConfig('fadeout')[0].node = this.querySelectorAll('.items')[e.model.index];
             this.playAnimation('fadeout');
+        },
+        remove: function (e) {
+            this.fire('remove-item', e.model.item);
         },
         removeItem: function (e) {
             if (this.itemToRemove) {
