@@ -71,7 +71,9 @@
                 <order-prices order="{{order}}" on-price-update="updateOrder"></order-prices>
             </section>
         </iron-pages>
-        <paper-toast id="message"></paper-toast>
+        <paper-toast id="message">
+            <a href="#" on-tap="redirect">Go Home</a>
+        </paper-toast>
     </template>
 </dom-module>
 <script>
@@ -94,11 +96,13 @@
             'order-changed': '_orderChanged'
         },
         _orderIdChanged: function () {
+            var orderid = parseInt(this.orderid);
             if (this.orderid > 0) {
                 console.log('loading order ' + this.orderid);
                 this.$.message.show({text:'Loading order...', duration:0});
                 new Firebase('https://swcoffee.firebaseio.com/orders')
                     .on('value', ss => {
+                        debugger;
                         // TODO: This is shitty, but i need to devise a priority key
                         // before i can do this more effectively.
                         var c = 0,
@@ -117,13 +121,15 @@
                         page.redirect('/orders');
                     });
             } else {
-                this.$.message.show({text:'Invalid order id, redirecting to order list...'});
-                page.redirect('/orders');
+                this.$.message.show({text:'Invalid order id ' + this.orderid, duration:0});
             }
         },
         _orderChanged: function () {
             if (!this.order) { return; }
             this.fb = new Firebase('https://swcoffee.firebaseio.com/orders/' + this.order.__firebaseKey__);
+        },
+        redirect: function () {
+            page.redirect('/orders');
         },
         updateOrder: function () {
             this.fb.update(this.order);
