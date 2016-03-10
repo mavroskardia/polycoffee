@@ -98,11 +98,9 @@
         _orderIdChanged: function () {
             var orderid = parseInt(this.orderid);
             if (this.orderid > 0) {
-                console.log('loading order ' + this.orderid);
                 this.$.message.show({text:'Loading order...', duration:0});
                 new Firebase('https://swcoffee.firebaseio.com/orders')
                     .on('value', ss => {
-                        debugger;
                         // TODO: This is shitty, but i need to devise a priority key
                         // before i can do this more effectively.
                         var c = 0,

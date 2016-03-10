@@ -11,7 +11,7 @@
             <div class="card-contents">
                 <template is="dom-repeat" items="{{getPersonalItems(order)}}">
                     <div class="horizontal layout items center">
-                        <span class="name self-center">{{item.person.name}}</span>
+                        <truncate-text class="name self-center" text="{{item.person.name}}"></truncate-text>
                         <div class="self-center">
                             {{item.quantity}}<span>&times;</span>
                         </div>
