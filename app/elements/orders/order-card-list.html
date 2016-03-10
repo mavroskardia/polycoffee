@@ -15,7 +15,6 @@
             location="https://swcoffee.firebaseio.com/orders"
             data="{{orders}}"
             order-by-child="date"
-            on-firebase-child-added="orderAdded"
             on-firebase-child-changed="orderChanged">
         </firebase-collection>
         <firebase-collection id="fbpeople"
@@ -42,28 +41,12 @@
             selectedOrder: {
                 type: Object,
                 notify: true
-            },
-            preSelectIndex: {
-                type: String,
-                observer: '_preSelectIndexChanged',
-                value: () => 0,
             }
         },
         listeners: {
             'order-selected': 'orderSelected'
         },
-        _preSelectIndexChanged: function () {
-            this.preSelectIndex = parseInt(this.preSelectIndex);
-        },
         reverse: (a, b) => b.date - a.date,
-        orderAdded: function (e, o) {
-            if (this.preSelectIndex > 0 && this.orders.length >= this.preSelectIndex) {
-                if (this.orders.indexOf(o) != -1) {
-                    this.orderSelected(null, this.orders[this.preSelectIndex - 1]);
-                    this.fire('order-selected');
-                }
-            }
-        },
         orderSelected: function (e, order) {
             [].forEach.call(this.querySelectorAll('order-card'), elt => elt.selected = false);
             order.selected = true;

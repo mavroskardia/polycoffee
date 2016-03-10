@@ -3,7 +3,8 @@
 		properties: {
 			order: {
 				type: Object,
-				notify: true
+				notify: true,
+                observer: '_orderChanged'
 			},
             sharedTotal: {
                 type: Number,
@@ -71,10 +72,18 @@
                 computed: '_isOrderStatus(order, "complete")'
             }
 		},
-        _isOrderStatus: (o, s) => o.status === s,
+        getOwed: function (order, person) {
+            var ptotal = OrderBehavior.getPersonalItems(order)
+                            .filter(i => i.person.__firebaseKey__ === person.__firebaseKey__)
+                            .map(i => i.quantity * OrderBehavior._bagCost(order, i) * 100)
+                            .reduce((a,b) => a + b, 0.0);
+            return person.sharing ? ptotal + this.sharedTotal : ptotal;
+        },
         getTeamItems: (o) => (o.items || []).filter(i => !i.personal),
         getPersonalItems: (o) => (o.items || []).filter(i => i.personal),
         lineitemCost: (o, i) => OrderBehavior._bagCost(o, i) * i.quantity * 100,
+        _orderChanged: function () { this.fire('order-changed', this.order); },
+        _isOrderStatus: (o, s) => o.status === s,
         _computePaidTotal: (o) => (o.payments || [])
                                     .map(p => p.paid)
                                     .reduce((a,b) => parseFloat(a) + parseFloat(b), 0.0),

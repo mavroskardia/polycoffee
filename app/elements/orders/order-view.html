@@ -33,7 +33,6 @@
         <header class="horizontal layout">
             <h2 class="flex">Order for <span>{{toDate(order.date)}}</span></h2>
             <div class="end self-center">
-                <!-- <team-dropdown order="{{order}}" disabled="{{!isOpen}}"></team-dropdown> -->
                 <order-action order="[[order]]" class="self-center"
                     on-order-closed="closeOrder"
                     on-order-paid="payOrder">
@@ -72,52 +71,68 @@
                 <order-prices order="{{order}}" on-price-update="updateOrder"></order-prices>
             </section>
         </iron-pages>
+        <paper-toast id="message"></paper-toast>
     </template>
 </dom-module>
 <script>
     Polymer({
         is: 'order-view',
+        behaviors: [OrderBehavior],
         properties: {
-            team: Object,
-            order: {
-                type: Object,
+            orderid: {
+                type: Number,
                 notify: true,
-                observer: '_orderChanged'
-            },
-            isOpen: {
-                type: Boolean,
-                computed: 'isOrderOpen(order)'
-            },
-            isClosed: {
-                type: Boolean,
-                computed: 'isOrderClosed(order)'
-            },
-            isPaid: {
-                type: Boolean,
-                computed: 'isOrderPaid(order)'
+                value: () => 0,
+                observer: '_orderIdChanged'
             },
             selected: {
                 type: Number,
                 value: () => 0
             }
         },
-        orderOpen: function (order) { return order.status === 'open'; },
-        isOrderOpen: o => o && o.status === 'open',
-        isOrderClosed: o => o && o.status === 'closed',
-        isOrderPaid: o => o && o.status === 'paid',
+        listeners: {
+            'order-changed': '_orderChanged'
+        },
+        _orderIdChanged: function () {
+            if (this.orderid > 0) {
+                this.$.message.show({text:'Loading order...', duration:0});
+                new Firebase('https://swcoffee.firebaseio.com/orders')
+                    .on('value', ss => {
+                        // TODO: This is shitty, but i need to devise a priority key
+                        // before i can do this more effectively.
+                        var c = 0,
+                            val = ss.val();
+
+                        for (k in val) {
+                            if (++c === parseInt(this.orderid)) {
+                                this.order = val[k];
+                                this.order.__firebaseKey__ = k;
+                                this.$.message.close();
+                                return;
+                            }
+                        }
+
+                        this.$.message.show({text:'Invalid order id, redirecting to order list...'});
+                        page.redirect('/orders');
+                    });
+            } else {
+                this.$.message.show({text:'Invalid order id, redirecting to order list...'});
+                page.redirect('/orders');
+            }
+        },
+        _orderChanged: function () {
+            if (!this.order) { return; }
+            this.fb = new Firebase('https://swcoffee.firebaseio.com/orders/' + this.order.__firebaseKey__);
+        },
+        updateOrder: function () {
+            this.fb.update(this.order);
+        },
         removeItem: function (e, item) {
             var idx = this.order.items.indexOf(item);
             if (idx > -1) {
                 this.splice('order.items', idx, 1);
                 this.updateOrder();
             }
-        },
-        updateOrder: function () {
-            this.fb.update(this.order);
-        },
-        _orderChanged: function () {
-            if (!this.order) { return; }
-            this.fb = new Firebase('https://swcoffee.firebaseio.com/orders/' + this.order.__firebaseKey__);
         },
         combine: function (order, lineitem) {
             if (!lineitem.isCoffee) { return; }
@@ -150,33 +165,6 @@
         toDate: t => new Date(t).toLocaleDateString(),
         closeOrder: function () {
             this.fb.update({'status': 'closed', 'closed_date': new Date().getTime() });
-        },
-        bagCost: function (item) {
-            if (!item.isCoffee) { return 0; }
-            return this.order.prices
-                    .filter(p => p.retail == item.coffee.price)
-                    .map(p => p.wholesale[item.size == 1 ? 0 : item.size == 2 ? 1 : 2])
-                    .reduce((p,c)=> p + c, 0.0);
-        },
-        getTeamShare: function (order) {
-            var teamTotal = order.items
-                                .filter(i => !i.personal && i.isCoffee)
-                                .map(i => i.quantity * this.bagCost(i) * 100)
-                                .concat(order.items
-                                    .filter(i => !i.isCoffee)
-                                    .map(i => i.price * i.quantity))
-                                .reduce((a,b) => a + b, 0.0);
-
-            return teamTotal / order.people.filter(p => p.sharing).length;
-        },
-        getOwed: function (order, person) {
-            var total = order.items
-                            .filter(i => i.isCoffee && i.personal && i.person.__firebaseKey__ === person.__firebaseKey__)
-                            .map(i => i.quantity * this.bagCost(i) * 100)
-                            .reduce((a,b) => a + b, 0.0);
-
-            total += person.sharing ? this.getTeamShare(order) : 0;
-            return total;
         },
         payOrder: function () {
             var payments = this.order.people.

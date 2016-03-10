@@ -2,7 +2,7 @@
     <style include="shared-styles"></style>
     <template>
         <iron-pages id="pages" selected="0">
-            <order-card-list pre-select-index="{{name}}" on-order-selected="toggle" selected-order="{{order}}"></order-card-list>
+            <order-card-list on-order-selected="toggle" selected-order="{{order}}"></order-card-list>
             <order-view order="{{order}}" on-view-closed="toggle"></order-view>
         </iron-pages>
     </template>
