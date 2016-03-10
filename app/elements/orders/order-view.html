@@ -95,6 +95,7 @@
         },
         _orderIdChanged: function () {
             if (this.orderid > 0) {
+                console.log('loading order ' + this.orderid);
                 this.$.message.show({text:'Loading order...', duration:0});
                 new Firebase('https://swcoffee.firebaseio.com/orders')
                     .on('value', ss => {
