@@ -76,7 +76,7 @@
           this.playAnimation();
         },
         remove: function (e) {
-          let index = this.people.findIndex((e,i,a) => e.__firebaseKey__ === this.keyToRemove);
+          var index = this.people.findIndex((e,i,a) => e.__firebaseKey__ === this.keyToRemove);
           this.splice('people', index, 1);
           this.keyToRemove = null;
           this.sortPeople();
