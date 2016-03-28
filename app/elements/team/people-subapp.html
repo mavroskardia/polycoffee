@@ -9,6 +9,7 @@
     <firebase-collection id="fbpeople"
       location="https://swcoffee.firebaseio.com/people"
       on-firebase-child-added="sortPeople"
+      on-firebase-child-changed="sortPeople"
       data="{{people}}">
     </firebase-collection>
     <div class="horizontal layout wrap start">
@@ -29,7 +30,7 @@
             <template is="dom-repeat" items="{{orderedPeople}}">
               <li class="horizontal layout center person">
                 <truncate-text text="{{item.name}}" class="flex"></truncate-text>
-                <paper-toggle-button checked="{{item.sharing}}"></paper-toggle-button>
+                <paper-toggle-button on-change="updatePerson" checked="{{item.sharing}}"></paper-toggle-button>
                 <paper-icon-button class="end" icon="clear" on-tap="iremove"</paper-icon-button>
               </li>
             </template>
@@ -77,6 +78,10 @@
               this.$.message.show({'text':'Cannot add duplicate name'});
             }
           }
+        },
+        updatePerson: function (e) {
+          var ref = new Firebase('https://swcoffee.firebaseio.com/people/'+e.model.item.__firebaseKey__);
+          ref.update({sharing:e.model.item.sharing});
         },
         fadeout: function (e) {
           this.keyToRemove = e.model.item.__firebaseKey__;
