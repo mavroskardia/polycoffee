@@ -99,7 +99,7 @@
                                     .filter(i => i.isCoffee)
                                     .map(i => i.size * i.quantity)
                                     .reduce((a,b) => a + b, 0.0),
-        _computeSharedPerCapita: (o, st) => st / o.people.filter(p => p.sharing).length,
+        _computeSharedPerCapita: (o, st) => Math.round(st / o.people.filter(p => p.sharing).length),
         _computeNumSharedItems: o => (o.items || []).filter(i => i.isCoffee && !i.personal).length,
         _computeNumPersonalItems: o => (o.items || []).filter(i => i.personal).length,
         _computePersonalTotal: (o) => (o.items || [])

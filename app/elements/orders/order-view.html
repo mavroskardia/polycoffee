@@ -108,8 +108,9 @@
 
                         for (k in val) {
                             if (++c === parseInt(this.orderid)) {
-                                this.order = val[k];
-                                this.order.__firebaseKey__ = k;
+                                var o = val[k];
+                                o.__firebaseKey__ = k
+                                this.order = o;
                                 this.$.message.close();
                                 return;
                             }
