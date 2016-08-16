@@ -39,6 +39,9 @@
         select: function () {
             this.item = this.inventory[parseInt(this.$.menu.selected)];
             this.fire('iron-select', this.item);
+        },
+        setSelectedTo: function (c) {
+          this.$.menu.selectIndex(this.inventory.findIndex(i => i.name == c.name));
         }
     });
 </script>

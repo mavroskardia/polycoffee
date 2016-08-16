@@ -33,9 +33,10 @@
         <header class="horizontal layout">
             <h2 class="flex">Order for <span>{{toDate(order.date)}}</span></h2>
             <div class="end self-center">
-                <order-action order="[[order]]" class="self-center"
-                    on-order-closed="closeOrder"
-                    on-order-paid="payOrder">
+                <order-action class="self-center"
+                  order="[[order]]"
+                  on-order-closed="closeOrder"
+                  on-order-paid="payOrder">
                 </order-action>
             </div>
         </header>
@@ -48,10 +49,11 @@
         <iron-pages selected="{{selected}}">
             <section class="tiles layout horizontal wrap start">
                 <div class="layout vertical">
-                    <order-add-item order="{{order}}"
-                        hidden$="{{!isOpen}}"
-                        on-add-coffee="addItemToOrder"
-                        on-add-other="addItemToOrder">
+                    <order-add-item id="addItem"
+                      order="{{order}}"
+                      hidden$="{{!isOpen}}"
+                      on-add-coffee="addItemToOrder"
+                      on-add-other="addItemToOrder">
                     </order-add-item>
                     <order-closed-summary hidden$="{{!isClosed}}" order="{{order}}"></order-closed-summary>
                     <order-payments hidden$="{{isOpen}}" order="{{order}}"></order-payments>
@@ -67,7 +69,7 @@
                 </div>
             </section>
             <section>
-                <order-coffee-list order="{{order}}"></order-coffee-list>
+                <order-coffee-list order="{{order}}" on-coffee-select="selectCoffee"></order-coffee-list>
                 <order-prices order="{{order}}" on-price-update="updateOrder"></order-prices>
             </section>
         </iron-pages>
@@ -190,6 +192,10 @@
         closeView: function () {
             page.redirect('/orders');
             //this.fire('view-closed');
+        },
+        selectCoffee: function (e, c) {
+          this.$.addItem.selectCoffee(c);
+          this.selected = 0;
         }
     });
 </script>

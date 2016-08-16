@@ -21,12 +21,13 @@
     <template>
         <div class="horizontal layout wrap start">
             <template is="dom-repeat" items="{{order.inventory}}">
-                <paper-material>
+                <paper-material on-tap="selectCoffee">
                     <iron-image sizing="cover" src="{{item.img}}"></iron-image>
                     <div class="vertical layout contents">
                         <strong>{{item.name}}</strong>
                         <currency-display value="{{item.price}}"></currency-display>
                     </div>
+                    <paper-ripple></paper-ripple>
                 </paper-material>
                 <!-- <paper-card class="white" image="{{item.img}}">
                     <div class="card-contents vertical layout">
@@ -43,6 +44,9 @@
         is: 'order-coffee-list',
         properties: {
             order: Object
+        },
+        selectCoffee: function (e) {
+          this.fire('coffee-select', e.model.item);
         }
     });
 </script>
