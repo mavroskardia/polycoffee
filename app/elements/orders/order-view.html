@@ -9,12 +9,14 @@
         order-prices,
         order-closed-summary,
         order-payments,
+        order-howto-pay,
         paper-card
         { margin: 0.5rem; }
 
         order-teamitems,
         order-personalitems,
         order-payments,
+        order-howto-pay,
         paper-card.totals
         {
             width: 32rem;
@@ -57,6 +59,7 @@
                     </order-add-item>
                     <order-closed-summary hidden$="{{!isClosed}}" order="{{order}}"></order-closed-summary>
                     <order-payments hidden$="{{isOpen}}" order="{{order}}"></order-payments>
+                    <order-howto-pay hidden$="{{isOpen}}"></order-howto-pay>
                 </div>
                 <div class="layout vertical">
                     <order-teamitems order="{{order}}" on-remove-item="removeItem"></order-teamitems>

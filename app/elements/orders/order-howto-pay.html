@@ -1,0 +1,27 @@
+<dom-module id="order-howto-pay">
+  <style include="shared-styles"></style>
+  <style>
+    paper-card { width: 100%; }
+    dl { overflow: hidden; }
+    dt, dd { display: inline-block; width: 10rem; padding: 0.5rem; }
+  </style>
+
+  <template>
+        <paper-card heading="How to Pay">
+            <div class="card-contents">
+                <dl>
+                  <dt>Google Wallet</dt>
+                  <dd><a href="mailto:andrewjmartin@gmail.com">andrewjmartin@gmail.com</a></dd>
+                  <dt>PayPal</dt>
+                  <dd>chryso@gmail.com</dd>
+                </dl>
+            </div>
+        </paper-card>
+  </template>
+
+  <script>
+    Polymer({
+        is: 'order-howto-pay'
+    });
+  </script>
+</dom-module>
