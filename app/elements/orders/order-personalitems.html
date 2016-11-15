@@ -3,6 +3,7 @@
     <style>
         paper-card { width: 32rem; }
         paper-icon-button { width: 30px; }
+        p { text-align: right; }
         .items > * { padding: 0.25rem; }
         .name { width: 4rem; }
     </style>
@@ -23,6 +24,7 @@
                         <paper-icon-button class="self-center end" hidden$="{{!isOpen}}" icon="clear" on-tap="remove"></paper-icon-button>
                     </div>
                 </template>
+                <p>Weight subtotal: <strong>[[sharedWeight]]#</strong></p>
             </div>
         </paper-card>
     </template>
@@ -32,18 +34,28 @@
         is: 'order-personalitems',
         behaviors: [OrderBehavior, Polymer.NeonAnimationRunnerBehavior],
         properties: {
-            itemToRemove: {
-                type: Object,
-                value: () => null
-            },
-            animationConfig: {
-                value: () => ({
-                    'fadeout': [{name: 'fade-out-animation'}]
-                })
-            }
+          itemToRemove: {
+              type: Object,
+              value: () => null
+          },
+          sharedWeight: {
+            type: Number,
+            computed: 'getSharedWeight(order)'
+          },
+          animationConfig: {
+              value: () => ({
+                  'fadeout': [{name: 'fade-out-animation'}]
+              })
+          }
         },
         listeners: {
             'neon-animation-finish': 'removeItem'
+        },
+        getSharedWeight: function (o) {
+          return this.getPersonalItems(o)
+            .filter(c => c.isCoffee)
+            .map(c => c.size * c.quantity)
+            .reduce((a, b) => a + b, 0);
         },
         fadeout: function (e) {
             this.itemToRemove = e.model.item;

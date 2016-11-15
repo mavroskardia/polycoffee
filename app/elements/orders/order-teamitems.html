@@ -3,6 +3,7 @@
     <style>
         paper-card { width: 32rem; }
         paper-icon-button { width: 30px; }
+        p { text-align: right; }
         .items > * { padding: 0.25rem; }
     </style>
     <template>
@@ -31,6 +32,7 @@
                         <paper-icon-button hidden$="{{!isOpen}}" icon="clear" class="self-center" on-tap="remove"></paper-icon-button>
                     </div>
                 </template>
+                <p>Weight Subtotal: <strong>[[teamWeight]]#</strong></p>
             </div>
         </paper-card>
     </template>
@@ -40,23 +42,33 @@
         is: 'order-teamitems',
         behaviors: [OrderBehavior, Polymer.NeonAnimationRunnerBehavior],
         properties: {
-            itemToRemove: {
-                type: Object,
-                value: () => null
-            },
-            animationConfig: {
-                value: () => ({
-                    'fadeout': [{
-                        name: 'fade-out-animation'
-                    }],
-                    'fadein': [{
-                        name: 'fade-in-animation'
-                    }]
-                })
-            }
+          itemToRemove: {
+            type: Object,
+            value: () => null
+          },
+          teamWeight: {
+            type: Number,
+            computed: 'getTeamWeight(order)'
+          },
+          animationConfig: {
+            value: () => ({
+              'fadeout': [{
+                  name: 'fade-out-animation'
+              }],
+              'fadein': [{
+                  name: 'fade-in-animation'
+              }]
+            })
+          }
         },
         listeners: {
             'neon-animation-finish': 'removeItem'
+        },
+        getTeamWeight: function(o) {
+          return this.getTeamItems(o)
+            .filter(c => c.isCoffee)
+            .map(i => i.size * i.quantity)
+            .reduce((a,b) => a + b, 0);
         },
         getItemCost: i => parseFloat(i.price) * parseInt(i.quantity),
         fadeoutItem: function (e) {
