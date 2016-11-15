@@ -7,7 +7,8 @@
     <template>
         <paper-card heading="Order Closed">
             <div class="card-contents">
-                <ul>
+              <pre id="foremail">[[generateList(order)]]</pre>
+<!--                 <ul>
                 <template is="dom-repeat" items="{{combinedItems(order)}}">
                     <li class="horizontal layout center">
                         <span>{{item.quantity}}<span>&times;</span></span>
@@ -16,38 +17,53 @@
                     </li>
                 </template>
                 </ul>
-            </div>
+ -->            </div>
         </paper-card>
     </template>
 </dom-module>
 <script>
-    Polymer({
-        is: 'order-closed-summary',
-        properties: {
-            order: Object
-        },
-        combinedItems: function (order) {
-            if (!order || !order.items) { return []; }
-            var bycoffee = {};
-            order.items.filter(i=>i.isCoffee).forEach(function (i) {
-                if (i.coffee.name in bycoffee) {
-                    bycoffee[i.coffee.name].quantity += parseInt(i.quantity);
-                } else {
-                    bycoffee[i.coffee.name] = {
-                        quantity: parseInt(i.quantity),
-                        size: parseInt(i.size),
-                        name: i.coffee.name
-                    };
-                }
-            });
+  Polymer({
+    is: 'order-closed-summary',
+    properties: {
+      order: Object
+    },
+    generateList: function (order) {
+      if (!order || !order.items) { return ''; }
 
-            var ret = [];
+      var bycoffee = {};
 
-            for (var k in bycoffee) {
-                ret.push(bycoffee[k]);
-            }
+      order.items.filter(i=>i.isCoffee).forEach(function (i) {
 
-            return ret;
+        if (!(i.coffee.name in bycoffee)) {
+          bycoffee[i.coffee.name] = {1: 0, 2: 0, 5: 0};
         }
-    });
+
+        bycoffee[i.coffee.name][parseInt(i.size)] += parseInt(i.quantity);
+
+      });
+
+      var ret = [];
+      var totalpounds = 0;
+
+      for (var name in bycoffee) {
+        for (var size in bycoffee[name]) {
+          if (bycoffee[name][size] > 0) {
+            ret.push({
+              name: name,
+              size: size,
+              quantity: bycoffee[name][size]
+            });
+            totalpounds += size * bycoffee[name][size];
+          }
+        }
+      }
+
+      console.log('double check: total pounds => ' + totalpounds);
+
+      return ret
+        .sort((a,b) => a.name.localeCompare(b.name))
+        .map(c => [c.quantity, '×', ' ', c.size, '#', ' ', c.name].join(''))
+        .join('\n');
+    }
+  });
 </script>
