@@ -1,12 +1,12 @@
 <dom-module id="sweetwater-scraper">
-    <style include="shared-styles"></style>
-    <template>
-        <iron-ajax id="ajax"
-             handle-as="json"
-             on-response="handleResponse">
-         </iron-ajax>
-         <paper-toast id="message"></paper-toast>
-    </template>
+  <style include="shared-styles"></style>
+  <template>
+    <iron-ajax id="ajax"
+      handle-as="json"
+      on-response="handleResponse">
+    </iron-ajax>
+    <paper-toast id="message"></paper-toast>
+  </template>
 </dom-module>
 <script>
     function zip(arrays) {
@@ -46,7 +46,7 @@
                 return;
             }
 
-            query.results.ul.li.forEach(function (li) {
+            query.results.ul[1].li.forEach(function (li) {
                 var names = li.div.filter(d => d.class.indexOf('ProductDetails') !== -1).map(d => d.strong.a.content);
                 var images = li.div.filter(d => d.class.indexOf('QuickView') !== -1).map(d => d.a.img.src);
                 var prices = li.div
