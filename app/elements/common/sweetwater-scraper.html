@@ -32,7 +32,7 @@
             }
         },
         scrape: function () {
-          var queryuri = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D'http%3A%2F%2Fwww.sweetwaterorganiccoffee.com%2Fcoffee%2F'%20and%20xpath%3D'%2F%2Ful%5Bcontains(%40class%2C%20%22ProductList%22)%5D'&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
+          var queryuri = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20htmlstring%20where%20url%3D'http%3A%2F%2Fwww.sweetwaterorganiccoffee.com%2Fcoffee%2F'%20and%20xpath%3D'%2F%2Ful%5Bcontains(%40class%2C%20%22ProductList%22)%5D'&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
           this.$.ajax.url = queryuri;
           this.$.ajax.generateRequest();
         },
@@ -46,26 +46,30 @@
                 return;
             }
 
-            query.results.ul[1].li.forEach(function (li) {
-                var names = li.div.filter(d => d.class.indexOf('ProductDetails') !== -1).map(d => d.strong.a.content);
-                var images = li.div.filter(d => d.class.indexOf('QuickView') !== -1).map(d => d.a.img.src);
-                var prices = li.div
-                    .filter(d => d.class.indexOf('Price') !== -1)
-                    .map(d => typeof d.em === 'object' ?
-                        parseInt(parseFloat(d.em.span.content.replace('\$', '')) * 100) :
-                        parseInt(parseFloat(d.em.replace('\$', '')) * 100));
+            var tempelt = document.createElement('temp');
+            tempelt.innerHTML = query.results.result;
 
-                zip([names, prices, images]).forEach(function (d) {
-                    this.push('coffees', {
-                        name: d[0],
-                        price: d[1],
-                        img: d[2],
-                        type: 'coffee'
-                    });
+            var names = tempelt.querySelectorAll('.ProductDetails strong a');
+            names = [].map.call(names, a => a.innerText);
+            var images = tempelt.querySelectorAll('.QuickView a img')
+            images = [].map.call(images, i => i.src);
+            var prices = tempelt.querySelectorAll('.ProductPriceRating em');
+            prices = [].map.call(prices, p => p.innerText.split('\n')) // break coffees with multiple prices down per line
+              .map(p => p.filter(p => /\d+/.test(p))) // filter down to those that have numbers in them
+              .map(p => parseFloat(p[0].replace(/\W+/, ''))); // take only the first number (skip sale prices)
 
-                    allprices.push({retail: d[1], wholesale: [8.75, 17.00, 41.25]});
-                }.bind(this));
+            zip([names, prices, images]).forEach(function (d) {
+              this.push('coffees', {
+                name: d[0],
+                price: d[1],
+                img: d[2],
+                type: 'coffee'
+              });
+
+              allprices.push({retail: d[1], wholesale: [8.75, 17.00, 41.25]});
             }.bind(this));
+
+            debugger;
 
             var uniquePrices = {};
             allprices.forEach(p => uniquePrices[p.retail] = p);
